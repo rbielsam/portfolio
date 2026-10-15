@@ -1,10 +1,10 @@
 # Tareas — Puesta en línea del portfolio en AWS (Spec 017)
 
-Estado: **pendiente de ejecución**
+Estado: **fase 1 completada — pendiente la ejecución de las fases 2 a 8 (persona usuaria)**
 
 > Esta spec **no modifica la aplicación ni ningún test**. Toca tres ficheros del repositorio y, sobre todo, infraestructura y servidor.
 >
-> **Quién ejecuta**: la infraestructura y los comandos del servidor se hacen en la cuenta de AWS y en la máquina; el agente no puede entrar en ninguna de las dos. Las fases 1 y 9 las hace el agente; las 2 a 8 las ejecuta la persona usuaria siguiendo `docs/despliegue.md`.
+> **Quién ejecuta**: la infraestructura y los comandos del servidor se hacen en la cuenta de AWS y en la máquina; el agente no puede entrar en ninguna de las dos. Las fases 0, 1 y 9 las hace el agente; las 2 a 8 las ejecuta la persona usuaria siguiendo `docs/despliegue.md`.
 
 ## Fase 0: Control de versiones ✅
 
@@ -25,7 +25,7 @@ Se añadieron además `.otrosDatos` y `Laravel/.phpunit.result.cache` al `.gitig
 
 ## Fase 1: Documentación y scripts
 
-### T1.1 `docs/despliegue.md` — nuevo
+### T1.1 `docs/despliegue.md` — nuevo ✅
 
 La guía que sostiene el RF-7. Debe permitir seguir cada paso **sin interpretación**: qué se pincha, qué se teclea y qué se comprueba después.
 
@@ -43,13 +43,41 @@ Contenido mínimo:
 
 Incluye el `.env` de producción con **los valores que hay que poner**, sin credenciales reales.
 
-### T1.2 `deploy/publicar.sh` — nuevo
+**Completada.** Doce secciones (0 a 11), de la contratación a las comprobaciones finales.
 
-Compila en local, sube el build y aplica una versión en el servidor. Debe ser reutilizable para publicar cambios posteriores (RF-7).
+**Errores corregidos durante la redacción**, todos verificados contra el proyecto:
 
-### T1.3 `deploy/respaldo.sh` — nuevo
+| Error | Comprobación |
+|---|---|
+| Decía `git clone` en el servidor | **No hay remoto**: se eligió el monorepo local. Cambiado a rsync. |
+| Faltaba `php8.3-cli` | `php8.3-fpm` no trae el binario `php`: sin él no hay `artisan` ni Composer. |
+| Instalaba `bcmath` e `intl` | `composer check-platform-reqs` no los pide y el código no los usa (grep sin resultados). |
+| Certbot en el paso 3.6 | `DocumentRoot` no existía todavía: **movido a 4.6**, tras instalar la aplicación. |
+| Faltaba configurar el DNS | Certbot necesita que el dominio resuelva: añadido el paso 2.3 con los registros A. |
+| Referencia a «paso 3.1» inexistente | La IP fija estaba en 2.3. |
+| No se creaba `storage/` en el servidor | `storage/` está excluido a propósito del rsync: añadida la creación de la estructura. |
+| Las fotos no se respaldaban | Dejado constado: RF-6 cubre la base de datos; las fotos son la spec 018. |
+
+### T1.2 `deploy/publicar.sh` — nuevo ✅
+
+Compila en local, sube el build y aplica una versión en el servidor. Reutilizable para publicar cambios posteriores (RF-7).
+
+**Completada.** Cinco pasos: pruebas del frontend → pruebas del backend → compilación → sincronización de código → sincronización del build → aplicación en el servidor.
+
+**Dos fallos detectados y corregidos durante la validación:**
+
+1. **`rsync --delete React/dist/ → Laravel/public/` borraba la entrada de Laravel.** Se comprobó ejecutándolo contra una copia: desaparecían `index.php`, `.htaccess`, `favicon.ico`, `robots.txt` y `storage/`. El servidor habría quedado muerto en la primera publicación. Corregido sincolonizando solo `public/assets/` y `public/index.html`, con salvaguarda en el servidor que verifica que `public/index.php` y `public/.htaccess` existen antes de seguir.
+2. **La sincronización de `Laravel/` con `--delete` borraba `public/index.html` y `public/assets/`**, que solo existen en el servidor. Funcionaba solo por el orden de los pasos; ahora están excluidos y cada ruta tiene un único dueño.
+
+**Validado** con `bash -n`, con ejecución completa usando `ssh`/`rsync`/`npm`/`php` simulados, con ejecución real del comando remoto contra una copia local, y con las tres salidas tempranas (sin servidor, fuera de la raíz, y la que verifica el `index.php` remoto).
+
+### T1.3 `deploy/respaldo.sh` — nuevo ✅
 
 Copia comprimida de la base de datos hacia el bucket de S3, con retención, y con la instrucción de **restauración** incluida en el propio script (RF-6).
+
+**Completada.** Lee la base de datos del `.env` del servidor —**no guarda credenciales**—, volcado con `--single-transaction`, subida a S3, limpieza de copias fuera de plazo, y **verificación de que el tamaño subido coincide con el local**, fallando si no coincide.
+
+Validado con `bash -n` y con la salida temprana (sin la aplicación instalada).
 
 ## Fase 2: Contratación
 
@@ -192,9 +220,9 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 ## Pendiente
 
 - [x] T0.1
-- [ ] T1.1
-- [ ] T1.2
-- [ ] T1.3
+- [x] T1.1
+- [x] T1.2
+- [x] T1.3
 - [ ] T2.1
 - [ ] T2.2
 - [ ] T3.1
