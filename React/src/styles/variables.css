@@ -1,0 +1,54 @@
+:root {
+  --color-primary: #1a3a5c;
+  --color-primary-dark: #0f2740;
+  --color-primary-light: #2a5a8a;
+  --color-secondary: #3d7ea6;
+  --color-accent: #5ba3d9;
+  --color-text: #ffffff;
+  --color-text-muted: #b8c5d3;
+  --color-bg: #0a1628;
+  --color-bg-gradient-start: #1a3a5c;
+  --color-bg-gradient-end: #0a1628;
+  --color-border: #2a4a6a;
+  --color-hover: #2a5a8a;
+  --color-hover-shadow: rgba(91, 163, 217, 0.3);
+  --color-danger: #e74c3c;
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --border-radius: 8px;
+  --border-radius-lg: 16px;
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+  /* Paleta del panel de administración: tema claro propio, separado de la web pública */
+  --admin-bg: #f5f5f5;
+  --admin-surface: #ffffff;
+  --admin-surface-soft: #fafafa;
+  --admin-surface-sunk: #e8e8e8;
+  --admin-surface-hover: #ecf0f1;
+  --admin-text: #333333;
+  --admin-text-muted: #5f6b70;
+  --admin-heading: #2c3e50;
+  --admin-border: #dddddd;
+  --admin-primary: #3498db;
+  --admin-primary-hover: #2980b9;
+  --admin-danger: #e74c3c;
+  --admin-danger-hover: #c0392b;
+  --admin-danger-bg: #fdecea;
+  --admin-warning: #f39c12;
+  --admin-nav-bg: #2c3e50;
+  --admin-nav-text: #ecf0f1;
+  --admin-nav-hover: #34495e;
+  --admin-nav-muted: #95a5a6;
+  --admin-neutral: #bdc3c7;
+  --admin-neutral-hover: #95a5a6;
+  --admin-role-admin: #e67e22;
+  --admin-role-reader: #95a5a6;
+}

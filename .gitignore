@@ -1,0 +1,34 @@
+# Credenciales y secretos
+database-setup.sql
+.otrosDatos
+.env
+.env.local
+.env.*.local
+
+# Laravel
+Laravel/.env
+Laravel/.env.backup
+Laravel/.phpunit.result.cache
+Laravel/storage/*.key
+Laravel/storage/logs/*.log
+Laravel/storage/framework/cache/data/*
+Laravel/storage/framework/sessions/*
+Laravel/storage/framework/views/*
+Laravel/bootstrap/cache/*.php
+
+# Dependencias
+node_modules/
+Laravel/node_modules/
+Laravel/vendor/
+
+# React build
+React/dist/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp

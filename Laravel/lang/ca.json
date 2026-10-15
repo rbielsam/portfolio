@@ -1,0 +1,23 @@
+{
+    "The given data was invalid.": "Les dades enviades no són vàlides.",
+    "(and :count more errors)": "(i :count errors més)",
+    "(and :count more error)": "(i :count error més)",
+    "The :method method is not supported for route :path. Supported methods: :methods.": "El mètode :method no està admes per a la ruta :path. Mètodes admesos: :methods.",
+    "The route :path could not be found.": "La ruta :path no s'ha trobat.",
+    "An error occurred while processing your request.": "S'ha produït un error en processar la sol·licitud.",
+    "Unauthenticated.": "No has iniciat sessió.",
+    "Not Found.": "No s'ha trobat.",
+    "Too Many Attempts.": "Massa intents.",
+    "No autorizado.": "No autoritzat.",
+    "No tienes permiso para esta acción.": "No tens permís per a aquesta acció.",
+    "Nuevo mensaje de contacto": "Nou missatge de contacte",
+    "Nuevo mensaje desde el portfolio": "Nou missatge des del portafoli",
+    "Nombre": "Nom",
+    "Email": "Email",
+    "Fecha": "Data",
+    "Sin fecha": "Sense data",
+    "Mensaje": "Missatge",
+    "Responde directamente a este correo para ponerte en contacto con :name.": "Respon directament a aquest correu per posar-te en contacte amb :name.",
+    "Mensaje enviado.": "Missatge enviat.",
+    "Mensaje enviado. Te responderé pronto.": "Missatge enviat. Et responderé aviat."
+}

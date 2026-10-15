@@ -1,0 +1,23 @@
+{
+    "The given data was invalid.": "Los datos enviados no son válidos.",
+    "(and :count more errors)": "(y :count errores más)",
+    "(and :count more error)": "(y :count error más)",
+    "The :method method is not supported for route :path. Supported methods: :methods.": "El método :method no está soportado para la ruta :path. Métodos admitidos: :methods.",
+    "The route :path could not be found.": "La ruta :path no se ha encontrado.",
+    "An error occurred while processing your request.": "Se ha producido un error al procesar la solicitud.",
+    "Unauthenticated.": "No has iniciado sesión.",
+    "Not Found.": "No encontrado.",
+    "Too Many Attempts.": "Demasiados intentos.",
+    "No autorizado.": "No autorizado.",
+    "No tienes permiso para esta acción.": "No tienes permiso para esta acción.",
+    "Nuevo mensaje de contacto": "Nuevo mensaje de contacto",
+    "Nuevo mensaje desde el portfolio": "Nuevo mensaje desde el portfolio",
+    "Nombre": "Nombre",
+    "Email": "Email",
+    "Fecha": "Fecha",
+    "Sin fecha": "Sin fecha",
+    "Mensaje": "Mensaje",
+    "Responde directamente a este correo para ponerte en contacto con :name.": "Responde directamente a este correo para ponerte en contacto con :name.",
+    "Mensaje enviado.": "Mensaje enviado.",
+    "Mensaje enviado. Te responderé pronto.": "Mensaje enviado. Te responderé pronto."
+}
