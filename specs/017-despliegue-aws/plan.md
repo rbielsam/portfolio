@@ -5,12 +5,14 @@
 **No cambia el código de la aplicación.** Esta spec crea infraestructura, configura un servidor y documenta cómo publicar. Es la primera spec del proyecto que no escribe casi ningún fichero de la app.
 
 - **3 ficheros nuevos** en el repositorio: una guía y dos scripts.
+- **Repositorio git inicializado** (monorepo, commit `8fcbc95`): se tomó como prerrequisito del RF-7, porque sin historial no hay versión anterior a la que volver al publicar.
 - **Backend intacto**: 0 cambios en `app/`, `routes/`, `config/` ni migraciones.
 - **Frontend intacto**: 0 cambios en `src/`. El build de producción ya funciona.
 - **Tests existentes intactos**: no se toca ningún test; las suites deben seguir igual (**234** frontend, **105** backend).
 - **Sin dependencias nuevas** en el proyecto: las herramientas del servidor (Apache, PHP, MySQL, Certbot) se instalan en el servidor, no en el repositorio.
 - **Sin integración continua**: el despliegue es manual y documentado, como pide la simplicidad de la constitución.
 - **No se mueven las fotos a S3**: eso es la spec 018.
+- **No se edita nada en el servidor para arreglar la aplicación**: si hiciera falta un cambio de código, se hace aquí, se prueba y se publica. Cambiar solo en el servidor desincroniza los entornos y la siguiente publicación lo revierte sin avisar.
 
 ## Stack confirmado
 

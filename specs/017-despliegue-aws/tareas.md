@@ -6,6 +6,23 @@ Estado: **pendiente de ejecución**
 >
 > **Quién ejecuta**: la infraestructura y los comandos del servidor se hacen en la cuenta de AWS y en la máquina; el agente no puede entrar en ninguna de las dos. Las fases 1 y 9 las hace el agente; las 2 a 8 las ejecuta la persona usuaria siguiendo `docs/despliegue.md`.
 
+## Fase 0: Control de versiones ✅
+
+### T0.1 Inicializar el repositorio
+
+**Completada.** Repositorio git en la raíz —**un único monorepo** con `Laravel/`, `React/`, `specs/`, `docs/` y la documentación—, con commit inicial `8fcbc95` (364 ficheros).
+
+Se tomó como prerrequisito del RF-7: sin historial no hay versión anterior a la que volver, y publicar sería copiar ficheros a mano sin control.
+
+**Revisión de secretos antes del commit**: se comprobaron uno a uno todos los ficheros que entrarían. Dos hallazgos:
+
+- **`.otrosDatos`** (en la raíz) contiene **dos claves de API** y no estaba en el `.gitignore`. Se añadió. ⚠️ La clave de Context7 quedó visible en el historial de la conversación antes de detectarse: **debe revocarse y generarse otra**.
+- **`database-setup.sql`** contiene una credencial en texto plano. Ya estaba excluido, y el propio fichero lo advertía.
+
+Se añadieron además `.otrosDatos` y `Laravel/.phpunit.result.cache` al `.gitignore`. Verificado con `git check-ignore` que quedan fuera `.env` de ambos proyectos, `.env.backup`, `database-setup.sql` y las vistas compiladas.
+
+**La foto de perfil no se versiona**: la configuración propia de Laravel excluye todo `storage/app/`, así que se sube al servidor por separado (T5.3).
+
 ## Fase 1: Documentación y scripts
 
 ### T1.1 `docs/despliegue.md` — nuevo
@@ -174,6 +191,7 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 
 ## Pendiente
 
+- [x] T0.1
 - [ ] T1.1
 - [ ] T1.2
 - [ ] T1.3
