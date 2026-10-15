@@ -32,3 +32,19 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+*.orig
+
+# Bases de datos locales
+*.sqlite
+*.sqlite3
+
+# Sesiones que Laravel crea al ejecutar las pruebas
+Laravel/storage/framework/testing/*
+
+# Archivos de trabajo local: no forman parte del proyecto
+.AIOptimizer.json
+skills-lock.json
+documentacion.odt
+
+# Memoria interna del agente: notas de trabajo, no forma parte del proyecto publicable
+MEMORY.md

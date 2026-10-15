@@ -10,7 +10,7 @@ Estado: **fase 1 completada — pendiente la ejecución de las fases 2 a 8 (pers
 
 ### T0.1 Inicializar el repositorio
 
-**Completada.** Repositorio git en la raíz —**un único monorepo** con `Laravel/`, `React/`, `specs/`, `docs/` y la documentación—, con commit inicial `903e634` (364 ficheros).
+**Completada.** Repositorio git en la raíz —**un único monorepo** con `Laravel/`, `React/`, `specs/`, `docs/` y la documentación—, con commit inicial `f45783e` (363 ficheros).
 
 Se tomó como prerrequisito del RF-7: sin historial no hay versión anterior a la que volver, y publicar sería copiar ficheros a mano sin control.
 
