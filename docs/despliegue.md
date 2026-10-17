@@ -287,19 +287,27 @@ curl -sS https://getcomposer.org/installer | sudo php -- \
 
 ### 4.1 · Código
 
-El repositorio **no tiene remoto**: vive en esta máquina, así que el servidor recibe el código **por rsync**, igual que hará después el script de publicación.
+El servidor recibe el código **por rsync**, igual que hará después el script de publicación. Así no necesita credenciales de GitHub y lo que llega es exactamente lo que se ha probado aquí.
 
 ```bash
 # En el SERVIDOR:
 sudo mkdir -p /var/www/portfolio
 sudo chown -R $USER:$USER /var/www/portfolio
 
+# `storage/` se excluye del rsync, así que su estructura se crea a mano.
+# Sin ella, `view:cache` del paso 4.3 falla.
+mkdir -p /var/www/portfolio/Laravel/storage/app/public/photos
+mkdir -p /var/www/portfolio/Laravel/storage/framework/cache/data
+mkdir -p /var/www/portfolio/Laravel/storage/framework/sessions
+mkdir -p /var/www/portfolio/Laravel/storage/framework/views
+mkdir -p /var/www/portfolio/Laravel/storage/logs
+
 # En ESTA máquina:
 rsync -az Laravel/ ubuntu@<IP>:/var/www/portfolio/Laravel/ \
     --exclude .env --exclude storage --exclude vendor
 ```
 
-Si más adelante se quiere un remoto (GitHub u otro), conviene que sea **privado**: la foto de perfil y el historial no deberían ser públicos.
+> **`storage/` es del servidor**, no del repositorio: ahí viven las fotos, la caché y los registros. No se sincroniza desde aquí —con `--delete` borraría las fotos ya subidas—, por eso se crea su estructura a mano y se respeta siempre.
 
 ### 4.2 · Configuración de producción
 
@@ -348,13 +356,15 @@ php artisan config:cache route:cache view:cache
 
 ### 4.4 · Usuario administrador
 
-La migración del paso 5 ya trae los usuarios reales. El comando existe para cuando se necesite crear uno:
+⚠️ **Este paso se ejecuta DESPUÉS del bloque 5, no antes.** La importación del paso 5 recrea las tablas con los datos reales —incluidos los 2 usuarios—, así que un administrador creado aquí **se perdería** en la importación.
 
 ```bash
 php artisan portfolio:setup-admin
 ```
 
 **Pide la contraseña a mano y no la deja escrita en ningún sitio.** Si se pierde, se recrea el usuario con tinker.
+
+> Si se está montando una instancia **desde cero y sin importar datos**, este es el paso que crea el primer administrador.
 
 ### 4.5 · Permisos
 
