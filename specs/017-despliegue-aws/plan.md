@@ -5,7 +5,7 @@
 **No cambia el código de la aplicación.** Esta spec crea infraestructura, configura un servidor y documenta cómo publicar. Es la primera spec del proyecto que no escribe casi ningún fichero de la app.
 
 - **3 ficheros nuevos** en el repositorio: una guía y dos scripts.
-- **Repositorio git inicializado** (monorepo, commit `f45783e`): se tomó como prerrequisito del RF-7, porque sin historial no hay versión anterior a la que volver al publicar. *El historial se reescribió después para eliminar el correo personal de la persona usuaria: los hashes cambiaron (ver MEMORY).*
+- **Repositorio git inicializado** (monorepo, commit `ede9a0a`): se tomó como prerrequisito del RF-7, porque sin historial no hay versión anterior a la que volver al publicar. *El historial se reescribió después para eliminar el correo personal de la persona usuaria: los hashes cambiaron (ver MEMORY).*
 - **Backend intacto**: 0 cambios en `app/`, `routes/`, `config/` ni migraciones.
 - **Frontend intacto**: 0 cambios en `src/`. El build de producción ya funciona.
 - **Tests existentes intactos**: no se toca ningún test; las suites deben seguir igual (**234** frontend, **105** backend).
