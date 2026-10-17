@@ -10,19 +10,38 @@
 - **Backend intacto**: 0 cambios en `app/`, `routes/`, `config/` ni migraciones.
 - **Frontend intacto**: 0 cambios en `src/`. El build de producción ya funciona.
 - **Tests existentes intactos**: no se toca ningún test; las suites deben seguir igual (**234** frontend, **105** backend).
-- **Sin dependencias nuevas** en el proyecto: las herramientas del servidor (Apache, PHP, MySQL, Certbot) se instalan en el servidor, no en el repositorio.
+- **Sin dependencias nuevas** en el proyecto: las herramientas del servidor (nginx, PHP, MySQL, Certbot) se instalan en el servidor, no en el repositorio.
 - **Sin integración continua**: el despliegue es manual y documentado, como pide la simplicidad de la constitución.
 - **No se mueven las fotos a S3**: eso es la spec 018.
 - **No se edita nada en el servidor para arreglar la aplicación**: si hiciera falta un cambio de código, se hace aquí, se prueba y se publica. Cambiar solo en el servidor desincroniza los entornos y la siguiente publicación lo revierte sin avisar.
 
 ## Stack confirmado
 
-- **Servidor**: Ubuntu 24.04 LTS + Apache + PHP 8.3 (FPM) sobre EC2 `t2.micro`.
+- **Servidor**: Ubuntu 26.04 LTS + nginx + PHP 8.5 (FPM) sobre EC2 `t3.micro`.
 - **Base de datos**: MySQL sobre RDS `db.t3.micro`.
 - **Copias**: un bucket de S3 **solo** para la base de datos.
 - **Correo**: Resend, que ya está funcionando.
 - **Certificados**: Let's Encrypt con Certbot.
 - **Verificación**: comprobaciones de navegador contra el sitio publicado, más las suites existentes como comprobación de no-regresión.
+
+### Enmienda — nginx en lugar de Apache
+
+El plan se aprobó con **Apache + PHP 8.3 sobre Ubuntu 24.04**. La persona usuaria creó la infraestructura con **Ubuntu 26.04** y pidió **nginx**, con lo que el stack quedó en **nginx + PHP 8.5**. Cambios de la enmienda:
+
+| Aspecto | Antes | Ahora |
+| --- | --- | --- |
+| Servidor web | Apache | **nginx** |
+| Ubuntu | 24.04 | **26.04** |
+| PHP | 8.3 | **8.5** (la que trae 26.04; el proyecto admite `^8.3`) |
+| EC2 | `t2.micro` | **`t3.micro`** |
+| Región | Milán `eu-south-1` | **España `eu-south-2`** |
+| Certbot | plugin `python3-certbot-apache` | plugin `python3-certbot-nginx` |
+
+**Por qué nginx**: gasta menos memoria en reposo que Apache, y en un `t3.micro` de 1 GB cada decena de megabytes cuenta. Además, los scripts (`deploy/publicar.sh`, `deploy/respaldo.sh`) **no dependían de Apache**: solo comprobaban que `public/index.php` y `public/.htaccess` existen, que sigue siendo válido como marca de integridad del backend.
+
+**Detalle que no puede olvidarse**: el `.htaccess` de Apache pasaba a PHP las cabeceras `Authorization` y `X-XSRF-Token`, que son las que transportan el token de sesión de Sanctum y el CSRF. nginx **no las reenvía por defecto**; hay que declararlas con `fastcgi_param` en el bloque `location ~ \.php$`. Sin ellas el login del panel no funciona y no es fácil ver por qué. Está resuelto en la §3.2 de `docs/despliegue.md`.
+
+**También**: `client_max_body_size` subido a 8 MB, porque nginx admite 1 MB por defecto y la foto de perfil se valida en 2 MB (`max:2048`); sin ese ajuste, nginx la rechazaría con un 413 antes de que Laravel la viera.
 
 ## Diagnóstico de partida
 
@@ -46,11 +65,11 @@ Lo que hay hoy y condiciona el plan:
 
 ### D1 — Región europea, cerca de España
 
-Elige una región de Europa con `t2.micro` disponible. La de **Milán (`eu-south-1`)** es la más cercana a España; **París (`eu-west-3`)** y **Fráncfort (`eu-central-1`)** también sirven. Lo importante es **no cambiarla después**: mover la infraestructura de región cuesta dinero y tiempo.
+Elige una región de Europa. La elegida ha sido **España (`eu-south-2`, Zaragoza)**; **Milán (`eu-south-1`)**, **París (`eu-west-3`)** y **Fráncfort (`eu-central-1`)** también sirven. Lo importante es **no cambiarla después**: mover la infraestructura de región cuesta dinero y tiempo.
 
-### D2 — `t2.micro` y suficiente disco
+### D2 — `t3.micro` y suficiente disco
 
-`db.t3.micro` y `t2.micro` son los que incluye la cuenta gratuita. El disco del EC2 debe ser de **al menos 8 GB** (hasta 30 GB están incluidos). Con MySQL fuera de la máquina, `t2.micro` tiene memoria de sobra: solo carga Apache y PHP.
+`db.t3.micro` y `t3.micro` son los que incluye la cuenta gratuita. El disco del EC2 debe ser de **al menos 8 GB** (hasta 30 GB están incluidos). Con MySQL fuera de la máquina, `t3.micro` tiene memoria de sobra: solo carga nginx y PHP.
 
 ### D3 — La base de datos no se expone
 
@@ -62,13 +81,13 @@ El EC2 lleva un **rol de IAM** con permisos de escritura sobre el bucket de copi
 
 ### D5 — El build de React se hace fuera del servidor
 
-El servidor **no instala Node**. Se compila en local (`npm run build`) y se sube el resultado. Gana en dos cosas: el `t2.micro` no gasta memoria compilando, y lo que hay en producción es exactamente lo que ya se ha probado aquí.
+El servidor **no instala Node**. Se compila en local (`npm run build`) y se sube el resultado. Gana en dos cosas: el `t3.micro` no gasta memoria compilando, y lo que hay en producción es exactamente lo que ya se ha probado aquí.
 
 ### D6 — La app React se publica dentro de `Laravel/public`
 
 El resultado del build (`index.html` y `assets/`) se coloca en `public/` del backend. Así **un solo dominio** sirve la app, la API y las fotos, que es lo que exige el RF-2.
 
-**Riesgo a comprobar**: `routes/web.php` tiene una ruta que devuelve la página de bienvenida de Laravel, y Apache entrega `index.html` antes que `index.php` si ambos existen. **Hay que verificar en el servidor que `/` entrega la app y no esa página.** Si no fuera así, se retira esa ruta, que la aplicación no usa.
+**Riesgo a comprobar**: `routes/web.php` tiene una ruta que devuelve la página de bienvenida de Laravel, y nginx entrega `index.html` antes que `index.php` si ambos existen. **Hay que verificar en el servidor que `/` entrega la app y no esa página.** Si no fuera así, se retira esa ruta, que la aplicación no usa.
 
 ### D7 — El `.env` de producción se genera aparte
 
@@ -86,7 +105,7 @@ Nunca se copia el `.env` de desarrollo. Se escribe uno nuevo con los valores de 
 
 ### D8 — HTTPS con Let's Encrypt
 
-Certbot con el plugin de Apache, que añade el certificado y programa su renovación. Redirección de HTTP a HTTPS.
+Certbot con el plugin de nginx, que añade el certificado y programa su renovación. Redirección de HTTP a HTTPS.
 
 ### D9 — Copias automáticas de la base de datos hacia S3
 
@@ -120,7 +139,7 @@ deploy/respaldo.sh      (nuevo: copia la base de datos a S3; corre por cron en e
 
 | Recurso | Detalle |
 |---|---|
-| EC2 | Ubuntu 24.04, `t2.micro`, ≥ 8 GB, con rol de IAM para S3 |
+| EC2 | Ubuntu 26.04, `t3.micro`, ≥ 8 GB, con rol de IAM para S3 |
 | RDS | MySQL `db.t3.micro`, en la misma VPC, solo accesible desde el EC2 |
 | S3 | Un bucket privado para copias, con ciclo de vida |
 | Reglas de seguridad | 80 y 443 abiertos, 22 solo desde la IP de administración, 3306 solo desde el EC2 |
@@ -140,7 +159,7 @@ Como esta spec no modifica código, **ningún test puede fallar por ella**. Se c
 
 1. **Contratar el dominio** `rbielsam.com` en un registrador al costo.
 2. **Crear la infraestructura** en AWS siguiendo `docs/despliegue.md`: EC2, RDS, bucket de S3, reglas de seguridad.
-3. **Configurar el servidor**: Apache, PHP y sus extensiones, MySQL, Composer, Certbot y HTTPS.
+3. **Configurar el servidor**: nginx, PHP y sus extensiones, MySQL, Composer, Certbot y HTTPS.
 4. **Preparar la aplicación en el servidor**: código, `.env` de producción, dependencias, migraciones y enlace de almacenamiento.
 5. **Migrar los datos**: base de datos y foto de perfil.
 6. **Publicar la primera versión**: compilar React en local, subir el build, comprobar que `/` entrega la app.

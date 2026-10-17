@@ -57,7 +57,7 @@ Contenido mínimo:
 
 1. **Contratar el dominio** y a qué registrador.
 2. **Crear la infraestructura** en AWS: EC2, RDS, bucket de S3, rol de IAM, reglas de seguridad.
-3. **Configurar el servidor**: Apache, PHP 8.3 y sus extensiones, MySQL, Composer, Certbot.
+3. **Configurar el servidor**: nginx, PHP 8.5 y sus extensiones, MySQL, Composer, Certbot.
 4. **Preparar la aplicación**: código, `.env` de producción, dependencias, migraciones, enlace de almacenamiento.
 5. **Migrar los datos**.
 6. **Publicar** la primera versión y una posterior.
@@ -74,7 +74,7 @@ Incluye el `.env` de producción con **los valores que hay que poner**, sin cred
 | Error | Comprobación |
 |---|---|
 | Decía `git clone` en el servidor | **No hay remoto**: se eligió el monorepo local. Cambiado a rsync. |
-| Faltaba `php8.3-cli` | `php8.3-fpm` no trae el binario `php`: sin él no hay `artisan` ni Composer. |
+| Faltaba `php8.5-cli` | `php8.5-fpm` no trae el binario `php`: sin él no hay `artisan` ni Composer. |
 | Instalaba `bcmath` e `intl` | `composer check-platform-reqs` no los pide y el código no los usa (grep sin resultados). |
 | Certbot en el paso 3.6 | `DocumentRoot` no existía todavía: **movido a 4.6**, tras instalar la aplicación. |
 | Faltaba configurar el DNS | Certbot necesita que el dominio resuelva: añadido el paso 2.3 con los registros A. |
@@ -117,7 +117,7 @@ Revisar en **Billing → Free Tier** hasta cuándo llega la gratuidad y qué ser
 
 ### T3.1 EC2
 
-Ubuntu 24.04, `t2.micro`, al menos 8 GB de disco, en una región europea cercana (**Milán `eu-south-1`**; válidas París o Fráncfort). Con **rol de IAM** con permisos de escritura sobre el bucket de copias (D4).
+Ubuntu 26.04, `t3.micro`, al menos 8 GB de disco, en una región europea (**España `eu-south-2`**; válidas Milán, París o Fráncfort). Con **rol de IAM** con permisos de escritura sobre el bucket de copias (D4).
 
 ### T3.2 RDS
 
@@ -141,7 +141,7 @@ Privado, con acceso público bloqueado y **regla de ciclo de vida** para no acum
 
 ### T4.1 Base del servidor
 
-Apache, PHP 8.3 con las extensiones que necesita Laravel (`mysql`, `mbstring`, `xml`, `curl`, `gd`, `zip`, `bcmath`), cliente de MySQL y Certbot.
+nginx, PHP 8.5 con las extensiones que necesita Laravel (`mysql`, `mbstring`, `xml`, `curl`, `gd`, `zip`), cliente de MySQL y Certbot.
 
 ### T4.2 Composer y HTTPS
 
@@ -182,7 +182,7 @@ Recuentos esperados: **1 formación · 1 experiencia · 0 proyectos · 2 usuario
 
 Colocar `index.html` y `assets/` en `public/` del backend.
 
-**Punto de más riesgo del plan**: en la raíz debe aparecer **el portfolio y no la página de bienvenida de Laravel**. `routes/web.php` tiene una ruta que la devuelve, y Apache entrega `index.html` antes que `index.php` si ambos existen. Se comprueba en el navegador y se deja escrito el resultado.
+**Punto de más riesgo del plan**: en la raíz debe aparecer **el portfolio y no la página de bienvenida de Laravel**. `routes/web.php` tiene una ruta que la devuelve, y nginx la esquiva porque `index index.html index.php` sirve el `index.html` del build antes que `index.php`. Se comprueba en el navegador y se deja escrito el resultado.
 
 ### T6.3 Resolver la interposición, si la hay
 

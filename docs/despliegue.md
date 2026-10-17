@@ -135,7 +135,7 @@ ssh -i tu-clave.pem ubuntu@<IP-ELASTICA>
 
 ```bash
 sudo apt update && sudo apt -y upgrade
-sudo apt -y install apache2 curl git unzip
+sudo apt -y install nginx curl git unzip
 sudo apt -y install php8.5-cli php8.5-fpm php8.5-mysql php8.5-mbstring \
     php8.5-xml php8.5-curl php8.5-gd php8.5-zip
 ```
@@ -146,7 +146,7 @@ sudo apt -y install php8.5-cli php8.5-fpm php8.5-mysql php8.5-mbstring \
 > apt-cache search --names-only '^php[0-9.]+-cli$' | sort
 > ```
 >
-> Y usa el que salga (por ejemplo `php8.4-cli`) en **todos** los sitios de esta guía donde aparezca: los paquetes, `a2dismod`, el socket de Apache y la ruta `/etc/php/X.Y/`. El proyecto admite `^8.3`, así que cualquier versión igual o superior sirve.
+> Y usa el que salga (por ejemplo `php8.4-cli`) en **todos** los sitios de esta guía donde aparezca: los paquetes y la ruta `/etc/php/X.Y/`. El proyecto admite `^8.3`, así que cualquier versión igual o superior sirve.
 
 **`php8.5-cli` es imprescindible y no lo trae `php8.5-fpm`.** Sin él no existe el comando `php`, y por lo tanto no hay `php artisan` ni Composer.
 
@@ -163,46 +163,92 @@ sudo apt -y install php8.5-cli php8.5-fpm php8.5-mysql php8.5-mbstring \
 
 La lista se ha comprobado contra `composer check-platform-reqs`: es el mínimo que este proyecto necesita. **No** se instala `bcmath` ni `intl`: no los exige Composer y el código no los usa.
 
-### 3.2 · Apache con PHP-FPM
+### 3.2 · nginx con PHP-FPM
 
-Activa el módulo de proxy y configura Apache para entregar PHP a PHP-FPM:
+Arranca PHP-FPM y nginx (nginx ya se instaló en el paso 3.1):
 
 ```bash
-# mod_php y PHP-FPM no conviven: si estuviera activo, se desactiva
-sudo a2dismod php8.5 2>/dev/null || true
-
-sudo a2enmod proxy_fcgi setenvif rewrite
-sudo systemctl enable --now php8.5-fpm apache2
+sudo systemctl enable --now php8.5-fpm nginx
 ```
 
 Crea el sitio:
 
 ```bash
-sudo tee /etc/apache2/sites-available/portfolio.conf > /dev/null <<'APACHE'
-<VirtualHost *:80>
-    ServerName rbielsam.com
-    DocumentRoot /var/www/portfolio/Laravel/public
+sudo tee /etc/nginx/sites-available/portfolio > /dev/null <<'NGINX'
+server {
+    listen 80;
 
-    <Directory /var/www/portfolio/Laravel/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
+    # El dominio se añade en el paso 4.6. El guion bajo actúa de comodín
+    # para poder entrar por la IP elástica mientras tanto.
+    server_name rbielsam.com www.rbielsam.com _;
 
-    <FilesMatch \.php$>
-        SetHandler "proxy:unix:/run/php/php8.5-fpm.sock|fcgi://localhost"
-    </FilesMatch>
+    root /var/www/portfolio/Laravel/public;
+    index index.html index.php;
 
-    ErrorLog  ${APACHE_LOG_DIR}/portfolio-error.log
-    CustomLog ${APACHE_LOG_DIR}/portfolio-access.log combined
-</VirtualHost>
-APACHE
+    charset utf-8;
 
-sudo a2ensite portfolio
-sudo a2dissite 000-default
-sudo systemctl reload apache2
+    # nginx admite 1 MB por defecto y la foto de perfil se valida en 2 MB
+    # (max:2048 en UploadProfilePhotoRequest). Sin esto, nginx la rechaza
+    # con un 413 antes de que Laravel llegue a verla.
+    client_max_body_size 8m;
+
+    access_log /var/log/nginx/portfolio-access.log;
+    error_log  /var/log/nginx/portfolio-error.log;
+
+    # Lo que no sea un fichero estático va al front controller de Laravel
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php8.5-fpm.sock;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+
+        # Sin estas dos, el login del panel no funciona. nginx no reenvía
+        # por defecto estas cabeceras a PHP-FPM, y son las que transportan
+        # el token de sesión de Sanctum y el CSRF. Equivalen a las líneas
+        # RewriteCond/RewriteRule de Authorization y X-XSRF-Token del
+        # .htaccess de Apache.
+        fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+        fastcgi_param HTTP_X_XSRF_TOKEN  $http_x_xsrf_token;
+
+        fastcgi_hide_header X-Powered-By;
+    }
+
+    # Los bundles llevan el hash en el nombre, así que cambian en cada
+    # build: se pueden cachear un año sin riesgo de servir una versión vieja
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # El HTML cambia en cada publicación: nunca cachearlo, o se quedaría
+    # apuntando a bundles que ya no existen
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    # No servir ficheros ocultos (.git, .env, .htaccess…)
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+NGINX
+
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo ln -s /etc/nginx/sites-available/portfolio /etc/nginx/sites-enabled/portfolio
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
-> Cambia `ServerName` si el dominio fuera otro.
+> **Comprueba siempre `nginx -t` antes de recargar.** Si responde `test is successful`, recarga tranquilo; si falla, nginx sigue sirviendo la configuración anterior y no te quedas sin web.
+
+**Sobre `index index.html index.php`**: es lo que hace que la raíz muestre **el portfolio** y no la página de bienvenida de Laravel. nginx busca `index.html` antes que `index.php`, y como `publicar.sh` copia el build de React ahí, la ruta `view('welcome')` de `routes/web.php` nunca se ejecuta.
+
+> **Un 404 en la raíz es normal en este punto**: `/var/www/portfolio` todavía no existe, se crea en el paso 4.1. La web empezará a responder después de instalar la aplicación.
+
+> **La caché de `index.html` es el fallo más típico al desplegar con nginx.** Si al actualizar la web se quedara vieja —o diera un 404 porque busca bundles que ya no existen—, comprueba que este bloque está tal cual.
 
 ### 3.3 · PHP-FPM para un servidor pequeño
 
@@ -317,22 +363,25 @@ sudo chmod -R 775 Laravel/storage Laravel/bootstrap/cache
 
 ### 4.6 · HTTPS
 
-Con la aplicación ya instalada, `DocumentRoot` existe y Certbot puede comprobar el dominio:
+Con la aplicación ya instalada, el directorio raíz existe y Certbot puede comprobar el dominio:
 
 ```bash
-sudo apt -y install certbot python3-certbot-apache
-sudo certbot --apache -d rbielsam.com -d www.rbielsam.com --redirect
+sudo apt -y install certbot python3-certbot-nginx
+sudo certbot --nginx -d rbielsam.com -d www.rbielsam.com --redirect
 ```
 
-Certbot añade el certificado y **programa su renovación**. Compruébalo con:
+Certbot añade el certificado, **reescribe el bloque de nginx** y programa la renovación. Comprueba ambas cosas:
 
 ```bash
 sudo systemctl status certbot.timer
+sudo nginx -t
 ```
 
 **Comprobación**: `http://rbielsam.com` debe redirigir a `https://`.
 
 > Si Certbot fallara por no llegar al dominio, el problema es el **DNS** (paso 2.3): `dig +short rbielsam.com` debe devolver la IP elástica.
+
+> **Lo que Certbot no toca**: el bloque de `location /assets/` y el de `location = /index.html` que definiste en el 3.2 se mantienen. Si tras certificar se te olvidara alguno, la web podría cargar lenta o servir una versión vieja. Comprueba que siguen ahí.
 
 ---
 
@@ -406,12 +455,14 @@ El script hace cinco cosas, en este orden:
 5. En el servidor, crea la estructura de `storage/`, instala dependencias de producción, aplica migraciones y refresca la caché.
 
 > **Nunca** se sincroniza `React/dist/` entero contra `Laravel/public/`: con `--delete` borraría `index.php`, `.htaccess` y las fotos. El script solo toca las rutas propias del frontend, y además verifica en el servidor que `public/index.php` y `public/.htaccess` siguen ahí antes de continuar.
+>
+> *(Bajo nginx el `.htaccess` no se usa —Laravel lo trae por si se sirve con Apache—, pero sigue siendo una buena marca de integridad: si falta, es que el backend se ha tocado.)*
 
 ### ⚠️ Punto de más riesgo
 
 En la raíz **debe aparecer el portfolio** —foto, nombre y navegación— y **no** la página de bienvenida de Laravel.
 
-Laravel tiene una ruta que la devuelve, y Apache entrega `index.html` antes que `index.php` si ambos existen. **Compruébalo en el navegador.** Si saliera la página de Laravel, se retira esa ruta:
+Laravel tiene una ruta que la devuelve, pero nginx sirve `index.html` antes que `index.php` gracias a `index index.html index.php` del paso 3.2, así que normalmente no aparece. **Compruébalo en el navegador.** Si saliera la página de Laravel, se retira esa ruta:
 
 ```bash
 # Solo si hace falta. Quitar la ruta que devuelve view('welcome') en routes/web.php
@@ -419,6 +470,8 @@ php artisan route:clear route:cache
 ```
 
 Ese cambio, si se necesita, **se hace en el repositorio, se prueba aquí y se publica**. No se edita en el servidor.
+
+> Si la raíz cargara **lenta** o devolviera **404 por buscar bundles que ya no existen** (`/assets/index-*.js`), el problema no es Laravel: es la caché de `index.html`. Comprueba el bloque `location = /index.html` con `Cache-Control: no-cache` del paso 3.2, y vacía la caché del navegador.
 
 ---
 
