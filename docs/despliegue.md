@@ -28,11 +28,14 @@ Y **nunca se edita el código directamente en el servidor**: si se hace, el ento
 
 | Concepto | Durante la prueba gratuita | Después |
 |---|---|---|
-| EC2 `t2.micro` | incluido | ≈ 8 – 10 $/mes |
+| EC2 `t3.micro` | incluido | ≈ 8 – 10 $/mes |
 | RDS `db.t3.micro` | incluido | ≈ 13 $/mes |
+| **IPv4 pública (IP elástica)** | **≈ 3,60 $/mes — NO cubierta** | ≈ 3,60 $/mes |
 | S3 (copias) | incluido | céntimos |
 | Dominio `.com` | ≈ 1 – 11 $ el año | ≈ 10 – 15 $/año |
-| **Total** | **prácticamente solo el dominio** | **≈ 22 – 28 $/mes** |
+| **Total** | **≈ 3,60 $/mes + el dominio** | **≈ 26 – 32 $/mes** |
+
+> **Desde febrero de 2024 AWS cobra toda IPv4 pública: 0,005 $/hora (≈ 3,60 $/mes) y ya no está incluida en el nivel gratuito.** Vale tanto para la IP pública automática como para la elástica. No hay alternativa razonable —sin IP pública no hay web—, pero conviene saberlo antes de mirar la factura.
 
 > Revisar los precios reales al contratar: cambian a menudo y por región.
 
