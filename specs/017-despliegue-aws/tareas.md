@@ -23,6 +23,30 @@ Se añadieron además `.otrosDatos` y `Laravel/.phpunit.result.cache` al `.gitig
 
 **La foto de perfil no se versiona**: la configuración propia de Laravel excluye todo `storage/app/`, así que se sube al servidor por separado (T5.3).
 
+### T0.2 Repositorio remoto en GitHub ✅
+
+**Ampliación sobre lo previsto.** La decisión D de `plan.md` asumía un repositorio **sin remoto**. La persona usuaria pidió publicar el proyecto en GitHub como vitrina para procesos de selección, así que la decisión se amplió: **`rbielsam/portfolio`, público**.
+
+Trabajo realizado:
+
+- **Reescritura del historial** para retirar el correo personal (autoría y `ADMIN_EMAIL`) y la IP literal.
+- **`MEMORY.md`** (notas internas de trabajo), **`documentacion.odt`** (documentación obsoleta en binario que duplicaba las specs) y **`skills-lock.json`** (metadato de herramientas) **fuera del historial** y añadidos al `.gitignore`.
+  - ⚠️ **Aprendizaje**: `.gitignore` **no des-trackea** un fichero ya versionado; hizo falta `git rm --cached` y una segunda reescritura. Ambos llegaron a subirse (en privado) antes de detectarlo.
+- **`README.md` nuevo**: presentación, stack, estructura, arranque local, pruebas y metodología. Los comandos y recuentos se verificaron antes de escribirlos.
+- **Push por SSH** con `~/.ssh/gitKey`, fijada en `~/.ssh/config` para que siga funcionando tras un reinicio.
+
+**Verificación desde fuera, sin credenciales** (lo que ve un visitante):
+
+| Comprobación | Resultado |
+| --- | --- |
+| Correo de los 7 commits | `289629399+rbielsam@users.noreply.github.com` ✅ |
+| Correo en el perfil | no expuesto ✅ |
+| `MEMORY.md`, `.otrosDatos`, `Laravel/.env`, `documentacion.odt`, `skills-lock.json` | 404 ✅ |
+| `README.md` como portada | renderizado ✅ |
+| `deploy/publicar.sh` vivo | 0 IPs, 0 credenciales ✅ |
+
+**RF-8 cumplido.** Repositorio: `github.com/rbielsam/portfolio` · HEAD `69bee62` · 365 ficheros · clon de 736K.
+
 ## Fase 1: Documentación y scripts
 
 ### T1.1 `docs/despliegue.md` — nuevo ✅
