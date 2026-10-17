@@ -60,7 +60,7 @@ Elige una región **europea**. **Milán (`eu-south-1`)** es la más cercana a Es
 
 | Parámetro | Valor |
 |---|---|
-| Imagen | **Ubuntu Server 24.04 LTS** |
+| Imagen | **Ubuntu Server 26.04 LTS** (la que se usó; 24.04 también sirve, pero PHP será 8.3) |
 | Tipo | `t2.micro` (1 vCPU, 1 GB) |
 | Almacenamiento | **8 GB** o más (hasta 30 GB incluidos) |
 | Región | la elegida en 2.1 |
@@ -136,22 +136,30 @@ ssh -i tu-clave.pem ubuntu@<IP-ELASTICA>
 ```bash
 sudo apt update && sudo apt -y upgrade
 sudo apt -y install apache2 curl git unzip
-sudo apt -y install php8.3-cli php8.3-fpm php8.3-mysql php8.3-mbstring \
-    php8.3-xml php8.3-curl php8.3-gd php8.3-zip
+sudo apt -y install php8.5-cli php8.5-fpm php8.5-mysql php8.5-mbstring \
+    php8.5-xml php8.5-curl php8.5-gd php8.5-zip
 ```
 
-**`php8.3-cli` es imprescindible y no lo trae `php8.3-fpm`.** Sin él no existe el comando `php`, y por lo tanto no hay `php artisan` ni Composer.
+> **La versión de PHP depende de la versión de Ubuntu.** Ubuntu 26.04 trae **PHP 8.5**; Ubuntu 24.04 traía 8.3. Comprueba cuál lleva tu servidor **antes** de teclear lo anterior:
+>
+> ```bash
+> apt-cache search --names-only '^php[0-9.]+-cli$' | sort
+> ```
+>
+> Y usa el que salga (por ejemplo `php8.4-cli`) en **todos** los sitios de esta guía donde aparezca: los paquetes, `a2dismod`, el socket de Apache y la ruta `/etc/php/X.Y/`. El proyecto admite `^8.3`, así que cualquier versión igual o superior sirve.
+
+**`php8.5-cli` es imprescindible y no lo trae `php8.5-fpm`.** Sin él no existe el comando `php`, y por lo tanto no hay `php artisan` ni Composer.
 
 | Paquete | Para qué |
 |---|---|
-| `php8.3-fpm` | ejecutar la web |
-| `php8.3-cli` | `php artisan` y Composer |
-| `php8.3-mysql` | conexión PDO a la base de datos |
-| `php8.3-xml` | `dom`, `xml` y `xmlwriter`, que Laravel exige |
-| `php8.3-mbstring` | texto multibyte |
-| `php8.3-curl` | cliente HTTP y envío de correos |
-| `php8.3-gd` | `intervention/image`, para las fotos |
-| `php8.3-zip` | comprimir y extraer |
+| `php8.5-fpm` | ejecutar la web |
+| `php8.5-cli` | `php artisan` y Composer |
+| `php8.5-mysql` | conexión PDO a la base de datos |
+| `php8.5-xml` | `dom`, `xml` y `xmlwriter`, que Laravel exige |
+| `php8.5-mbstring` | texto multibyte |
+| `php8.5-curl` | cliente HTTP y envío de correos |
+| `php8.5-gd` | `intervention/image`, para las fotos |
+| `php8.5-zip` | comprimir y extraer |
 
 La lista se ha comprobado contra `composer check-platform-reqs`: es el mínimo que este proyecto necesita. **No** se instala `bcmath` ni `intl`: no los exige Composer y el código no los usa.
 
@@ -161,10 +169,10 @@ Activa el módulo de proxy y configura Apache para entregar PHP a PHP-FPM:
 
 ```bash
 # mod_php y PHP-FPM no conviven: si estuviera activo, se desactiva
-sudo a2dismod php8.3 2>/dev/null || true
+sudo a2dismod php8.5 2>/dev/null || true
 
 sudo a2enmod proxy_fcgi setenvif rewrite
-sudo systemctl enable --now php8.3-fpm apache2
+sudo systemctl enable --now php8.5-fpm apache2
 ```
 
 Crea el sitio:
@@ -181,7 +189,7 @@ sudo tee /etc/apache2/sites-available/portfolio.conf > /dev/null <<'APACHE'
     </Directory>
 
     <FilesMatch \.php$>
-        SetHandler "proxy:unix:/run/php/php8.3-fpm.sock|fcgi://localhost"
+        SetHandler "proxy:unix:/run/php/php8.5-fpm.sock|fcgi://localhost"
     </FilesMatch>
 
     ErrorLog  ${APACHE_LOG_DIR}/portfolio-error.log
@@ -201,12 +209,12 @@ sudo systemctl reload apache2
 Con 1 GB de memoria hay que limitar los procesos de PHP:
 
 ```bash
-sudo sed -i 's/^pm = .*/pm = dynamic/' /etc/php/8.3/fpm/pool.d/www.conf
-sudo sed -i 's/^pm.max_children = .*/pm.max_children = 3/' /etc/php/8.3/fpm/pool.d/www.conf
-sudo sed -i 's/^pm.start_servers = .*/pm.start_servers = 1/' /etc/php/8.3/fpm/pool.d/www.conf
-sudo sed -i 's/^pm.min_spare_servers = .*/pm.min_spare_servers = 1/' /etc/php/8.3/fpm/pool.d/www.conf
-sudo sed -i 's/^pm.max_spare_servers = .*/pm.max_spare_servers = 2/' /etc/php/8.3/fpm/pool.d/www.conf
-sudo systemctl restart php8.3-fpm
+sudo sed -i 's/^pm = .*/pm = dynamic/' /etc/php/8.5/fpm/pool.d/www.conf
+sudo sed -i 's/^pm.max_children = .*/pm.max_children = 3/' /etc/php/8.5/fpm/pool.d/www.conf
+sudo sed -i 's/^pm.start_servers = .*/pm.start_servers = 1/' /etc/php/8.5/fpm/pool.d/www.conf
+sudo sed -i 's/^pm.min_spare_servers = .*/pm.min_spare_servers = 1/' /etc/php/8.5/fpm/pool.d/www.conf
+sudo sed -i 's/^pm.max_spare_servers = .*/pm.max_spare_servers = 2/' /etc/php/8.5/fpm/pool.d/www.conf
+sudo systemctl restart php8.5-fpm
 ```
 
 ### 3.4 · Cliente de MySQL y AWS CLI
