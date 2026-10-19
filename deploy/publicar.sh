@@ -84,7 +84,7 @@ fi
 # 3 · Sincronizar el código ---------------------------------------------------
 echo
 echo "→ 3/5  Sincronizando el código de Laravel"
-rsync -az -e "${SSH[*]}"--delete "${EXCLUSIONES[@]}" Laravel/ "$DESTINO/Laravel/"
+rsync -az -e "${SSH[*]}" --delete "${EXCLUSIONES[@]}" Laravel/ "$DESTINO/Laravel/"
 
 # 4 · Sincronizar el build ----------------------------------------------------
 # ⚠️ NUNCA sincizar React/dist/ entero con --delete contra Laravel/public/:
@@ -94,8 +94,8 @@ rsync -az -e "${SSH[*]}"--delete "${EXCLUSIONES[@]}" Laravel/ "$DESTINO/Laravel/
 #     bundles anteriores) y index.html.
 echo
 echo "→ 4/5  Sincronizando el build del frontend"
-rsync -az -e "${SSH[*]}"--delete React/dist/assets/ "$DESTINO/Laravel/public/assets/"
-rsync -az -e "${SSH[*]}"React/dist/index.html "$DESTINO/Laravel/public/index.html"
+rsync -az -e "${SSH[*]}" --delete React/dist/assets/ "$DESTINO/Laravel/public/assets/"
+rsync -az -e "${SSH[*]}" React/dist/index.html "$DESTINO/Laravel/public/index.html"
 
 # 5 · Aplicar en el servidor --------------------------------------------------
 echo
