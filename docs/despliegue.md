@@ -309,6 +309,18 @@ rsync -az Laravel/ ubuntu@<IP>:/var/www/portfolio/Laravel/ \
 
 > **`storage/` es del servidor**, no del repositorio: ahí viven las fotos, la caché y los registros. No se sincroniza desde aquí —con `--delete` borraría las fotos ya subidas—, por eso se crea su estructura a mano y se respeta siempre.
 
+> **Configura `~/.ssh/config` en esta máquina antes de sincronizar.** Sin eso, `rsync` falla con `Permission denied (publickey)`: el `ssh` que invoca no sabe qué clave usar, y lo mismo le pasaría a `deploy/publicar.sh`. En `~/.ssh/config`:
+>
+> ```
+> Host 89.60.98.210 portfolio
+>     HostName 89.60.98.210
+>     User ubuntu
+>     IdentityFile ~/.ssh/portfolio.pem
+>     IdentitiesOnly yes
+> ```
+>
+> Con eso funcionan a la vez `ssh sin -i`, los tres `rsync` y `PORTFOLIO_SERVIDOR=portfolio ./deploy/publicar.sh`.
+
 ### 4.2 · Configuración de producción
 
 **Se escribe desde cero.** Nunca se copia el `.env` de desarrollo.
