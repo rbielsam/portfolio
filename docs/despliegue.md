@@ -116,6 +116,16 @@ Crea un bucket **privado** para las copias:
 
 Crea un rol que pueda **escribir y borrar en ese bucket** y asígnalo a la instancia EC2. Así el servidor accede a S3 **sin tener claves de acceso guardadas en disco**, que si se cuelan quedan expuestas.
 
+Las acciones exactas que necesita el rol son:
+
+| Acción | Recurso |
+|---|---|
+| `s3:PutObject` y `s3:GetObject` | `arn:aws:s3:::<bucket>/*` |
+| `s3:DeleteObject` | `arn:aws:s3:::<bucket>/*` |
+| `s3:ListBucket` | `arn:aws:s3:::<bucket>` |
+
+> **Ojo**: `ListBucket` va sobre el ARN del bucket (**sin** `/*`) y las acciones sobre objetos, sobre el ARN con `/*`. Sin `PutObject` el respaldo falla al subir, aunque el resto funcione.
+
 ### 2.7 · Reglas de seguridad
 
 | Puerto | Origen | Por qué |
@@ -557,26 +567,42 @@ aws s3 cp s3://<bucket>/portfolio-<fecha>.sql.gz - | gunzip | \
 
 ## 8 · Correo
 
-Hoy el remitente es `onboarding@resend.dev`, que **solo llega a la propia cuenta de Resend**. Para que los mensajes lleguen de verdad:
+El remitente por defecto de Resend (`onboarding@resend.dev`) **solo llega a la propia cuenta de Resend**. Para que los mensajes lleguen de verdad, se verifica un dominio propio en Resend y se configura el servidor.
 
-1. En el panel del servicio de correo, **verifica el dominio**: te dará registros DNS (DKIM y SPF).
-2. Añade esos registros en el **DNS del registrador**.
-3. Espera a que se verifique.
-4. Cambia en el `.env` **del servidor**:
+### 8.1 · Verificar el dominio en Resend
 
-   ```
-   MAIL_FROM_ADDRESS=noreply@rbielsam.es
-   ```
+1. En Resend, **API Keys → Create API Key** (Production) y guarda la clave.
+2. En **Domains → Add Domain**, añade el dominio de envío. Aquí se verificó el subdominio **`send.rbielsam.es`** (Resend recomienda un subdominio para aislar la reputación del envío). Elige la región más cercana a los destinatarios (EU).
+3. En la pestaña **Records** del dominio, copia los registros que genera Resend. En este caso, dos `TXT` (SPF y DKIM).
+4. Añade esos registros en el **DNS de IONOS** (Dominios y SSL → `rbielsam.es` → DNS). En el campo «nombre», escribe **solo la parte del subdominio** (`send`, `xxx._domainkey`) o déjalo vacío para la raíz; IONOS añade el dominio solo. Copia el valor **exacto**, sin comillas.
+5. En Resend, pulsa **Verify**. Se verifica en ~15 min (puede tardar hasta 72 h).
 
-5. En el servidor, recarga la caché y comprueba:
+> **No hace falta crear ningún buzón en IONOS**: el remitente solo es el «From» con el que Resend firma.
 
-   ```bash
-   cd /var/www/portfolio/Laravel
-   php artisan config:cache
-   php artisan portfolio:test-email
-   ```
+### 8.2 · Configurar el servidor
+
+En el `.env` **del servidor**:
+
+```
+MAIL_MAILER=resend
+RESEND_API_KEY=<clave de Resend>
+MAIL_FROM_ADDRESS=noreply@send.rbielsam.es
+ADMIN_EMAIL=<correo que recibe los mensajes>
+```
+
+> El remitente debe ser del dominio verificado: como aquí se verificó `send.rbielsam.es`, el remitente es `noreply@send.rbielsam.es`. Si se verificara también el raíz, se podría usar `noreply@rbielsam.es`.
+
+Recarga la caché y prueba:
+
+```bash
+cd /var/www/portfolio/Laravel
+php artisan config:cache
+php artisan portfolio:test-email
+```
 
 **Comprobación real**: enviar el formulario desde el sitio publicado y **confirmar que el correo llega** y no acaba en la carpeta de correo no deseado.
+
+> Opcional pero recomendado: una vez verificado, añadir un registro **DMARC** (`TXT` en `_dmarc.rbielsam.es`) para reforzar la entrega.
 
 ---
 
