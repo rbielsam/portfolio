@@ -2,7 +2,7 @@
 
 Aplicación web que presenta mi perfil profesional —formación, experiencia, proyectos y contacto— con un panel de administración desde el que se gestiona todo el contenido.
 
-**Sitio:** [rbielsam.com](https://rbielsam.com) *(en preparación)*
+**Sitio:** [rbielsam.es](https://rbielsam.es) *(en preparación)*
 
 ---
 
@@ -11,7 +11,7 @@ Aplicación web que presenta mi perfil profesional —formación, experiencia, p
 | Capa | Tecnología |
 | --- | --- |
 | Frontend | React 18 · Vite · CSS3 |
-| Backend | Laravel 13 · PHP 8.3 |
+| Backend | Laravel 13 · PHP 8.5 |
 | Base de datos | MySQL |
 | Autenticación | Laravel Sanctum (tokens) |
 | Despliegue | AWS (EC2 + RDS + S3) |

@@ -1,6 +1,6 @@
 # Despliegue en AWS
 
-Puesta en línea del portfolio en AWS, con `rbielsam.com` como dominio.
+Puesta en línea del portfolio en AWS, con `rbielsam.es` como dominio.
 
 Este documento es la **única fuente** para desplegar, actualizar y restaurar. Está escrito para seguirse paso a paso sin interpretar. Si algo no cuadra, **se para y se pregunta**.
 
@@ -39,13 +39,13 @@ Y **nunca se edita el código directamente en el servidor**: si se hace, el ento
 
 > Revisar los precios reales al contratar: cambian a menudo y por región.
 
-**Si el coste de después no compensa**, la alternativa es dejarlo todo en una sola máquina (`t2.micro` con MySQL dentro), que ronda los 9 $/mes. No es el caso elegido, pero conviene saber que existe.
+**Si el coste de después no compensa**, la alternativa es dejarlo todo en una sola máquina (`t3.micro` con MySQL dentro), que ronda los 9 $/mes. No es el caso elegido, pero conviene saber que existe.
 
 ---
 
 ## 1 · Contratar el dominio
 
-Registra **`rbielsam.com`** en un registrador **al costo** (que venda sin extras ni subidas de precio). Es más barato que registrarlo en AWS y **viene con DNS incluido**, así que no hay que pagar una zona de Route 53.
+Registra **`rbielsam.es`** en un registrador **al costo** (que venda sin extras ni subidas de precio). Es más barato que registrarlo en AWS y **viene con DNS incluido**, así que no hay que pagar una zona de Route 53.
 
 **No apuntes todavía el dominio a nada.** Primero hay que crear la infraestructura y tener la **IP fija** (paso 2.3); si se apunta antes, el sitio se caerá cada vez que la instancia se reinicie. El registro DNS se configura al final, cuando ya existe la IP.
 
@@ -55,7 +55,7 @@ Registra **`rbielsam.com`** en un registrador **al costo** (que venda sin extras
 
 ### 2.1 · Región
 
-Elige una región **europea**. **Milán (`eu-south-1`)** es la más cercana a España; `eu-west-3` (París) y `eu-central-1` (Fráncfort) también sirven.
+Elige una región **europea**. La elegida en este proyecto es **España (`eu-south-2`, Zaragoza)**; `eu-south-1` (Milán), `eu-west-3` (París) y `eu-central-1` (Fráncfort) también sirven.
 
 **No cambies de región después**: mover la infraestructura cuesta dinero y tiempo.
 
@@ -64,7 +64,7 @@ Elige una región **europea**. **Milán (`eu-south-1`)** es la más cercana a Es
 | Parámetro | Valor |
 |---|---|
 | Imagen | **Ubuntu Server 26.04 LTS** (la que se usó; 24.04 también sirve, pero PHP será 8.3) |
-| Tipo | `t2.micro` (1 vCPU, 1 GB) |
+| Tipo | `t3.micro` (1 vCPU, 1 GB) |
 | Almacenamiento | **8 GB** o más (hasta 30 GB incluidos) |
 | Región | la elegida en 2.1 |
 
@@ -81,12 +81,14 @@ Con la IP en la mano, **configura el DNS** en el registrador, con un registro **
 | `@` (el dominio raíz) | la IP elástica |
 | `www` | la misma IP elástica |
 
+En **IONOS** (el registrador de este proyecto): **Panel de control → Dominios y SSL → DNS** del dominio, y añade dos registros **A** — uno con el nombre vacío (la raíz) y otro con `www` — ambos apuntando a la IP elástica. No hace falta crear una zona en Route 53: IONOS trae el DNS incluido.
+
 Esto **hay que hacerlo aquí, antes del paso 4.6**: Certbot comprueba que el dominio resuelve hacia el servidor para emitir el certificado, y si no resuelve, falla.
 
 Puede tardar unos minutos en propagarse. Se comprueba con:
 
 ```bash
-dig +short rbielsam.com
+dig +short rbielsam.es
 ```
 
 Debe devolver la IP elástica **antes** de continuar.
@@ -183,7 +185,7 @@ server {
 
     # El dominio se añade en el paso 4.6. El guion bajo actúa de comodín
     # para poder entrar por la IP elástica mientras tanto.
-    server_name rbielsam.com www.rbielsam.com _;
+    server_name rbielsam.es www.rbielsam.es _;
 
     root /var/www/portfolio/Laravel/public;
     index index.html index.php;
@@ -268,9 +270,18 @@ sudo systemctl restart php8.5-fpm
 
 ### 3.4 · Cliente de MySQL y AWS CLI
 
+El servidor usa **AWS CLI 2** (`aws --version` → `aws-cli/2.x`). Ubuntu distribuye `awscli` en sus repos, pero esa es la **v1**; la v2 se instala con el instalador oficial de AWS:
+
 ```bash
-sudo apt -y install mysql-client awscli
+sudo apt -y install mysql-client
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+sudo unzip -o /tmp/awscliv2.zip -d /tmp
+sudo /tmp/aws/install
+rm -rf /tmp/aws /tmp/awscliv2.zip
+aws --version
 ```
+
+> `unzip` ya se instaló en el paso 3.1. Si `aws --version` ya respondiera `aws-cli/2.x`, no hay que repetirlo: el instalador actualiza sobre lo existente.
 
 ### 3.5 · Composer
 
@@ -312,8 +323,8 @@ rsync -az Laravel/ ubuntu@<IP>:/var/www/portfolio/Laravel/ \
 > **Configura `~/.ssh/config` en esta máquina antes de sincronizar.** Sin eso, `rsync` falla con `Permission denied (publickey)`: el `ssh` que invoca no sabe qué clave usar, y lo mismo le pasaría a `deploy/publicar.sh`. En `~/.ssh/config`:
 >
 > ```
-> Host 89.60.98.210 portfolio
->     HostName 89.60.98.210
+> Host <IP> portfolio
+>     HostName <IP>
 >     User ubuntu
 >     IdentityFile ~/.ssh/portfolio.pem
 >     IdentitiesOnly yes
@@ -337,7 +348,7 @@ Edita `.env` con los valores de producción:
 | `APP_NAME` | `Portfolio` |
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | **`false`** |
-| `APP_URL` | `https://rbielsam.com` |
+| `APP_URL` | `https://rbielsam.es` |
 | `APP_LOCALE` | `es` |
 | `APP_KEY` | lo genera el paso 4.3 |
 | `DB_HOST` | **el endpoint de RDS** |
@@ -392,7 +403,7 @@ Con la aplicación ya instalada, el directorio raíz existe y Certbot puede comp
 
 ```bash
 sudo apt -y install certbot python3-certbot-nginx
-sudo certbot --nginx -d rbielsam.com -d www.rbielsam.com --redirect
+sudo certbot --nginx -d rbielsam.es -d www.rbielsam.es --redirect
 ```
 
 Certbot añade el certificado, **reescribe el bloque de nginx** y programa la renovación. Comprueba ambas cosas:
@@ -402,9 +413,9 @@ sudo systemctl status certbot.timer
 sudo nginx -t
 ```
 
-**Comprobación**: `http://rbielsam.com` debe redirigir a `https://`.
+**Comprobación**: `http://rbielsam.es` debe redirigir a `https://`.
 
-> Si Certbot fallara por no llegar al dominio, el problema es el **DNS** (paso 2.3): `dig +short rbielsam.com` debe devolver la IP elástica.
+> Si Certbot fallara por no llegar al dominio, el problema es el **DNS** (paso 2.3): `dig +short rbielsam.es` debe devolver la IP elástica.
 
 > **Lo que Certbot no toca**: el bloque de `location /assets/` y el de `location = /index.html` que definiste en el 3.2 se mantienen. Si tras certificar se te olvidara alguno, la web podría cargar lenta o servir una versión vieja. Comprueba que siguen ahí.
 
@@ -552,7 +563,7 @@ Hoy el remitente es `onboarding@resend.dev`, que **solo llega a la propia cuenta
 4. Cambia en el `.env` **del servidor**:
 
    ```
-   MAIL_FROM_ADDRESS=noreply@rbielsam.com
+   MAIL_FROM_ADDRESS=noreply@rbielsam.es
    ```
 
 5. En el servidor, recarga la caché y comprueba:
@@ -623,7 +634,7 @@ Antes de restaurar sobre la real, haz una **copia de seguridad** del estado actu
 
 ## 11 · Comprobaciones finales
 
-- [ ] `https://rbielsam.com` carga **sin aviso de sitio inseguro**.
+- [ ] `https://rbielsam.es` carga **sin aviso de sitio inseguro**.
 - [ ] Por HTTP redirige a HTTPS.
 - [ ] En la raíz aparece **el portfolio**, no la página de Laravel.
 - [ ] El panel permite iniciar sesión y abrir **las seis vistas**.

@@ -50,7 +50,7 @@ Lo que hay hoy y condiciona el plan:
 | Hecho | Consecuencia |
 |---|---|
 | `APP_ENV=local`, `APP_DEBUG=true` | En producción hay que apagar la depuración: filtraría una traza con todo lo configurado |
-| `APP_URL=http://localhost:8000` | Debe ser `https://rbielsam.com` |
+| `APP_URL=http://localhost:8000` | Debe ser `https://rbielsam.es` |
 | `DB_HOST=127.0.0.1` | Debe ser el punto final de RDS |
 | `SESSION_DRIVER=database`, `SESSION_DOMAIN=null` | **No se tocan**: con un solo dominio funcionan tal cual |
 | `FILESYSTEM_DISK=local` | **No se toca**: las fotos siguen en disco hasta la spec 018 |
@@ -97,7 +97,7 @@ Nunca se copia el `.env` de desarrollo. Se escribe uno nuevo con los valores de 
 |---|---|
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | **`false`** |
-| `APP_URL` | `https://rbielsam.com` |
+| `APP_URL` | `https://rbielsam.es` |
 | `APP_LOCALE` | `es` |
 | `DB_HOST` | punto final de RDS |
 | `SESSION_DOMAIN` | se deja en `null` (un solo dominio) |
@@ -143,7 +143,7 @@ deploy/respaldo.sh      (nuevo: copia la base de datos a S3; corre por cron en e
 | RDS | MySQL `db.t3.micro`, en la misma VPC, solo accesible desde el EC2 |
 | S3 | Un bucket privado para copias, con ciclo de vida |
 | Reglas de seguridad | 80 y 443 abiertos, 22 solo desde la IP de administración, 3306 solo desde el EC2 |
-| Dominio | `rbielsam.com` registrado fuera de AWS, apuntando al EC2 |
+| Dominio | `rbielsam.es` registrado fuera de AWS, apuntando al EC2 |
 
 ## Tests existentes que leen esta zona
 
@@ -157,7 +157,7 @@ Como esta spec no modifica código, **ningún test puede fallar por ella**. Se c
 
 ## Pasos de implementación
 
-1. **Contratar el dominio** `rbielsam.com` en un registrador al costo.
+1. **Contratar el dominio** `rbielsam.es` en un registrador al costo.
 2. **Crear la infraestructura** en AWS siguiendo `docs/despliegue.md`: EC2, RDS, bucket de S3, reglas de seguridad.
 3. **Configurar el servidor**: nginx, PHP y sus extensiones, MySQL, Composer, Certbot y HTTPS.
 4. **Preparar la aplicación en el servidor**: código, `.env` de producción, dependencias, migraciones y enlace de almacenamiento.
@@ -177,7 +177,7 @@ Como esta spec no modifica código, **ningún test puede fallar por ella**. Se c
 ### Manual — contra el sitio publicado
 
 **1 · El sitio responde (RF-1)**
-Acceder a `https://rbielsam.com` desde otra red (datos móviles, no la misma que el servidor) y comprobar que se carga la página pública **sin ningún aviso de sitio inseguro**. Acceder por `http://rbielsam.com` y comprobar que redirige a HTTPS.
+Acceder a `https://rbielsam.es` desde otra red (datos móviles, no la misma que el servidor) y comprobar que se carga la página pública **sin ningún aviso de sitio inseguro**. Acceder por `http://rbielsam.es` y comprobar que redirige a HTTPS.
 
 **2 · Es la aplicación, no la página de bienvenida de Laravel (RF-1, D6)**
 En la raíz debe aparecer el portfolio —foto, nombre y navegación— y **no** la página azul de Laravel. Es el punto que más riesgo tiene de fallar.
@@ -213,7 +213,7 @@ Al terminar queda escrito en `docs/despliegue.md` **qué cuesta el despliegue** 
 
 ## Criterios de finalización del plan
 
-- `https://rbielsam.com` sirve la página pública sin avisos de inseguridad.
+- `https://rbielsam.es` sirve la página pública sin avisos de inseguridad.
 - El panel permite iniciar sesión y gestionar las seis vistas en el dominio.
 - Los datos publicados coinciden con los de origen y no hay registros de prueba.
 - La foto de perfil se ve en la página pública y en el panel.

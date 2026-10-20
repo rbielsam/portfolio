@@ -179,7 +179,7 @@ La aplicación importa React Router pero **no lo usa**: no hay `<Routes>`, ni `<
 - **Estructura**: dos specs — primero ponerlo en línea, después las fotos — para que si la migración de fotos se retrasa el sitio siga funcionando (decisión de la persona usuaria).
 - **Nada estaba contratado**: esta spec incluye contratar también el dominio (decisión de la persona usuaria).
 - **Sistema operativo y servidor web**: Ubuntu con nginx (ampliado desde Apache, ver D0 abajo), que era la pregunta que planteó la persona usuaria.
-- **Nombre del dominio**: **`rbielsam.com`**, con el criterio de ser lo más económico posible y sin publicidad (decisión de la persona usuaria). No existe un `.com` gratuito legítimo; las opciones reales son una promoción de primer año (más barato el año uno, más caro después) o un registrador al costo de unos 10 – 11 $/año. **Los precios concretos se comprueban al contratar**: no se fijan aquí porque cambian a menudo. Se recomienda registrar **fuera de AWS**, que es más barato y el registrador trae el DNS incluido, evitando pagar una zona de Route 53.
+- **Nombre del dominio**: **`rbielsam.es`**, con el criterio de ser lo más económico posible y sin publicidad (decisión de la persona usuaria). **Contratado en IONOS**, que lo da con DNS incluido y sin coste de zona en Route 53. No existe un `.es` gratuito legítimo; **el precio real se comprueba al contratar** y no se fija aquí porque cambia a menudo. Se recomienda registrar **fuera de AWS**, que es más barato y el registrador trae el DNS incluido.
 
 ## Dudas abiertas
 

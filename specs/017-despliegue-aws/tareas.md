@@ -1,6 +1,6 @@
 # Tareas — Puesta en línea del portfolio en AWS (Spec 017)
 
-Estado: **fase 1 completada — pendiente la ejecución de las fases 2 a 8 (persona usuaria)**
+Estado: **fases 0 a 5 completadas** — repositorio, documentación, infraestructura AWS, servidor y datos migrados. **Pendiente: publicar (T6), copias a S3 (T7), correo (T8) y verificación (T9).** El dominio **`rbielsam.es`** ya está contratado (IONOS).
 
 > Esta spec **no modifica la aplicación ni ningún test**. Toca tres ficheros del repositorio y, sobre todo, infraestructura y servidor.
 >
@@ -105,9 +105,9 @@ Validado con `bash -n` y con la salida temprana (sin la aplicación instalada).
 
 ## Fase 2: Contratación
 
-### T2.1 Dominio `rbielsam.com`
+### T2.1 Dominio `rbielsam.es` ✅
 
-Registrado en un registrador al costo, con el DNS incluido. **Se comprueba al contratar** el precio real del primer año y de la renovación, porque la guía no debe fijar cifras que cambian.
+**Completada.** Contratado en **IONOS**, que lo da con DNS incluido y sin coste de zona en Route 53. El DNS todavía **no** está apuntando a la IP elástica: se configura en el paso 2.3 de `docs/despliegue.md`, una vez que la infraestructura y la IP fija existen (ya existen).
 
 ### T2.2 Cuenta de AWS
 
@@ -157,7 +157,7 @@ Código en el servidor y `.env` de producción generado **desde cero**, nunca co
 |---|---|
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | **`false`** (RF-8) |
-| `APP_URL` | `https://rbielsam.com` |
+| `APP_URL` | `https://rbielsam.es` |
 | `DB_HOST` | punto final de RDS |
 | `SESSION_DOMAIN` | se **deja** en `null` — un solo dominio |
 | `FILESYSTEM_DISK` | se **deja** en `local` — las fotos van a S3 en la spec 018 |
@@ -212,7 +212,7 @@ Cambiar `MAIL_FROM_ADDRESS` a una dirección del dominio propio y comprobar que 
 
 ### T9.1 Comprobaciones de navegador
 
-Contra `https://rbielsam.com`, **desde otra red que la del servidor** (datos móviles, no el mismo wifi):
+Contra `https://rbielsam.es`, **desde otra red que la del servidor** (datos móviles, no el mismo wifi):
 
 - La página pública carga **sin aviso de sitio inseguro**; por HTTP redirige a HTTPS.
 - La raíz muestra **el portfolio**, no la página de bienvenida de Laravel.
@@ -247,17 +247,17 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [x] T1.1
 - [x] T1.2
 - [x] T1.3
-- [ ] T2.1
+- [x] T2.1
 - [ ] T2.2
-- [ ] T3.1
-- [ ] T3.2
-- [ ] T3.3
-- [ ] T3.4
-- [ ] T4.1
+- [x] T3.1
+- [x] T3.2
+- [x] T3.3
+- [x] T3.4
+- [x] T4.1
 - [ ] T4.2
-- [ ] T5.1
-- [ ] T5.2
-- [ ] T5.3
+- [x] T5.1
+- [x] T5.2
+- [x] T5.3
 - [ ] T6.1
 - [ ] T6.2
 - [ ] T6.3
@@ -270,3 +270,5 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [ ] T9.3
 - [ ] T9.4
 - [ ] T9.5
+
+> **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** está a medias: Composer está instalado, pero el **certificado HTTPS (Certbot)** está pendiente hasta que el DNS de `rbielsam.es` apunte a la IP elástica.
