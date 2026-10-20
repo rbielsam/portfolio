@@ -64,10 +64,15 @@ fi
 
 # 2 · Volcado -----------------------------------------------------------------
 echo "→ Volcando $DB_NAME desde $DB_HOST"
+# --set-gtid-purged=OFF: en RDS los GTID vienen activos y, con el valor por
+# defecto (AUTO), mysqldump ejecuta FLUSH TABLES WITH READ LOCK para capturar
+# la posición GTID, y RDS lo bloquea con un 1045. Con OFF no hace falta ese
+# bloqueo y el volcado sigue siendo consistente gracias a --single-transaction.
 mysqldump \
     --host="$DB_HOST" \
     --user="$DB_USER" \
     --single-transaction \
+    --set-gtid-purged=OFF \
     --quick \
     --routines \
     --triggers \

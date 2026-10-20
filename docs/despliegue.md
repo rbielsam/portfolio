@@ -530,6 +530,8 @@ El script comprueba además que el archivo subido pesa lo mismo que el volcado l
 
 > La **retención** principal se configura como **regla de ciclo de vida del bucket** (paso 2.5). El script limpia además los archivos que ya hubieran quedado fuera de plazo, por si el bucket no la tuviera.
 
+> ⚠️ **En RDS los GTID vienen activos** y, con el valor por defecto, `mysqldump` ejecuta `FLUSH TABLES WITH READ LOCK` para capturar la posición GTID — y RDS lo bloquea con un `1045`, de modo que el respaldo falla. El script ya añade **`--set-gtid-purged=OFF`** para evitarlo. Si se copia el `mysqldump` a mano, incluir esa opción.
+
 Programar, por ejemplo, cada día a las 4:00:
 
 ```bash
