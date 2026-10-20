@@ -1,6 +1,6 @@
 # Tareas — Puesta en línea del portfolio en AWS (Spec 017)
 
-Estado: **fases 0 a 5 completadas** y **publicado (T6)** — repositorio, documentación, infraestructura AWS, servidor, datos migrados y build en `Laravel/public/`. **Pendiente: copias a S3 (T7), correo (T8) y verificación (T9).** El dominio **`rbielsam.es`** ya está contratado (IONOS).
+Estado: **fases 0 a 5 completadas**, **publicado (T6)** y **copias a S3 (T7)**. **Pendiente: correo (T8) y verificación (T9).** El dominio **`rbielsam.es`** ya está contratado (IONOS).
 
 > Esta spec **no modifica la aplicación ni ningún test**. Toca tres ficheros del repositorio y, sobre todo, infraestructura y servidor.
 >
@@ -261,8 +261,8 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [x] T6.1
 - [x] T6.2
 - [x] T6.3
-- [ ] T7.1
-- [ ] T7.2
+- [x] T7.1
+- [x] T7.2
 - [ ] T8.1
 - [ ] T8.2
 - [ ] T9.1
@@ -273,4 +273,4 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 
 > **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** está a medias: Composer está instalado, pero el **certificado HTTPS (Certbot)** está pendiente hasta que el DNS de `rbielsam.es` apunte a la IP elástica. **T6.3** no hizo falta: la raíz sirvió el portfolio directamente (nginx sirve `index.html` antes que `index.php`).
 
-> **Pendiente de infraestructura (T3.1)**: el rol IAM `portfolio-respaldos-role` **no tiene `s3:PutObject`**, así que el respaldo no puede subir a S3. Hay que ampliar su política (ver `docs/despliegue.md` §7).
+> **Resuelto (T3.1)**: el rol IAM `portfolio-respaldos-role` tenía los ARN duplicados (`arn:aws:s3:::arn:aws:s3:::…`), así que `s3:PutObject` no casaba con el bucket. Corregido y verificado con un respaldo real.
