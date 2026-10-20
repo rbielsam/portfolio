@@ -254,7 +254,7 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [x] T3.3
 - [x] T3.4
 - [x] T4.1
-- [ ] T4.2
+- [x] T4.2
 - [x] T5.1
 - [x] T5.2
 - [x] T5.3
@@ -271,6 +271,6 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [ ] T9.4
 - [ ] T9.5
 
-> **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** está a medias: Composer está instalado, pero el **certificado HTTPS (Certbot)** está pendiente hasta que el DNS de `rbielsam.es` apunte a la IP elástica. **T6.3** no hizo falta: la raíz sirvió el portfolio directamente (nginx sirve `index.html` antes que `index.php`).
+> **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** completado (Composer + Certbot/HTTPS). **T6.3** no hizo falta: la raíz sirvió el portfolio directamente (nginx sirve `index.html` antes que `index.php`).
 
 > **Resuelto (T3.1)**: el rol IAM `portfolio-respaldos-role` tenía los ARN duplicados (`arn:aws:s3:::arn:aws:s3:::…`), así que `s3:PutObject` no casaba con el bucket. Corregido y verificado con un respaldo real.
