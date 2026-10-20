@@ -1,6 +1,6 @@
 # Tareas — Puesta en línea del portfolio en AWS (Spec 017)
 
-Estado: **fases 0 a 5 completadas** — repositorio, documentación, infraestructura AWS, servidor y datos migrados. **Pendiente: publicar (T6), copias a S3 (T7), correo (T8) y verificación (T9).** El dominio **`rbielsam.es`** ya está contratado (IONOS).
+Estado: **fases 0 a 5 completadas** y **publicado (T6)** — repositorio, documentación, infraestructura AWS, servidor, datos migrados y build en `Laravel/public/`. **Pendiente: copias a S3 (T7), correo (T8) y verificación (T9).** El dominio **`rbielsam.es`** ya está contratado (IONOS).
 
 > Esta spec **no modifica la aplicación ni ningún test**. Toca tres ficheros del repositorio y, sobre todo, infraestructura y servidor.
 >
@@ -258,9 +258,9 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [x] T5.1
 - [x] T5.2
 - [x] T5.3
-- [ ] T6.1
-- [ ] T6.2
-- [ ] T6.3
+- [x] T6.1
+- [x] T6.2
+- [x] T6.3
 - [ ] T7.1
 - [ ] T7.2
 - [ ] T8.1
@@ -271,4 +271,4 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [ ] T9.4
 - [ ] T9.5
 
-> **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** está a medias: Composer está instalado, pero el **certificado HTTPS (Certbot)** está pendiente hasta que el DNS de `rbielsam.es` apunte a la IP elástica.
+> **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** está a medias: Composer está instalado, pero el **certificado HTTPS (Certbot)** está pendiente hasta que el DNS de `rbielsam.es` apunte a la IP elástica. **T6.3** no hizo falta: la raíz sirvió el portfolio directamente (nginx sirve `index.html` antes que `index.php`).
