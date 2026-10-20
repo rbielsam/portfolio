@@ -272,3 +272,5 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [ ] T9.5
 
 > **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** está a medias: Composer está instalado, pero el **certificado HTTPS (Certbot)** está pendiente hasta que el DNS de `rbielsam.es` apunte a la IP elástica. **T6.3** no hizo falta: la raíz sirvió el portfolio directamente (nginx sirve `index.html` antes que `index.php`).
+
+> **Pendiente de infraestructura (T3.1)**: el rol IAM `portfolio-respaldos-role` **no tiene `s3:PutObject`**, así que el respaldo no puede subir a S3. Hay que ampliar su política (ver `docs/despliegue.md` §7).
