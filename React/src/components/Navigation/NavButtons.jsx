@@ -11,10 +11,15 @@ const buttons = [
   { id: 'Contacto', clave: 'seccion.contacto' },
 ]
 
-function NavButtons() {
+function NavButtons({ onNavigate }) {
   const { activeSection, setActiveSection } = useSection()
   const { user } = useAuth()
   const { t } = useLanguage()
+
+  const go = (id) => {
+    setActiveSection(id)
+    if (onNavigate) onNavigate()
+  }
 
   return (
     <nav className="nav-buttons">
@@ -22,7 +27,7 @@ function NavButtons() {
         <button
           key={id}
           className={`nav-buttons__button ${activeSection === id ? 'nav-buttons__button--active' : ''}`}
-          onClick={() => setActiveSection(id)}
+          onClick={() => go(id)}
         >
           {t(clave)}
         </button>
@@ -32,7 +37,7 @@ function NavButtons() {
       ) : (
         <button
           className={`nav-buttons__button ${activeSection === 'Login' ? 'nav-buttons__button--active' : ''}`}
-          onClick={() => setActiveSection('Login')}
+          onClick={() => go('Login')}
         >
           {t('nav.login')}
         </button>

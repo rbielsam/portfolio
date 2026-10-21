@@ -45,9 +45,9 @@ function PublicView() {
     <Layout nav={isMobile ? null : <NavButtons />}>
       {isMobile && (
         <>
-          <FloatingButton onClick={() => setIsSheetOpen(true)} />
+          <FloatingButton onClick={() => setIsSheetOpen((open) => !open)} />
           <BottomSheet isOpen={isSheetOpen} onClose={() => setIsSheetOpen(false)}>
-            <NavButtons />
+            <NavButtons onNavigate={() => setIsSheetOpen(false)} />
           </BottomSheet>
         </>
       )}
