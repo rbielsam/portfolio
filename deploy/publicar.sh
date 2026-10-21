@@ -81,6 +81,11 @@ if [[ ! -f React/dist/index.html ]]; then
     exit 1
 fi
 
+if [[ ! -f React/dist/favicon.svg ]]; then
+    echo "✗ No se ha generado React/dist/favicon.svg; falta React/public/favicon.svg."
+    exit 1
+fi
+
 # 3 · Sincronizar el código ---------------------------------------------------
 echo
 echo "→ 3/5  Sincronizando el código de Laravel"
@@ -91,11 +96,12 @@ rsync -az -e "${SSH[*]}" --delete "${EXCLUSIONES[@]}" Laravel/ "$DESTINO/Laravel
 #     borraría index.php, .htaccess, favicon.ico, robots.txt y storage/,
 #     dejando el servidor sin forma de atender peticiones. Solo se sincronizan
 #     las rutas propias del frontend: assets/ (con --delete para limpiar los
-#     bundles anteriores) y index.html.
+#     bundles anteriores), index.html y favicon.svg.
 echo
 echo "→ 4/5  Sincronizando el build del frontend"
 rsync -az -e "${SSH[*]}" --delete React/dist/assets/ "$DESTINO/Laravel/public/assets/"
 rsync -az -e "${SSH[*]}" React/dist/index.html "$DESTINO/Laravel/public/index.html"
+rsync -az -e "${SSH[*]}" React/dist/favicon.svg "$DESTINO/Laravel/public/favicon.svg"
 
 # 5 · Aplicar en el servidor --------------------------------------------------
 echo
