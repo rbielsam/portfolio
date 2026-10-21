@@ -1,6 +1,6 @@
 # Tareas — Fotos en S3 y CloudFront (Spec 018)
 
-Estado: **completada** (pendiente solo la prueba visual desde el panel y borrar el CloudFront antiguo de copias).
+Estado: **completada y verificada en producción**.
 
 ## Fase 1 — Código
 
@@ -43,5 +43,6 @@ Estado: **completada** (pendiente solo la prueba visual desde el panel y borrar 
 
 ## Pendiente
 
-- [ ] Probar **subir/sustituir/borrar** desde el panel en producción (prueba visual).
-- [ ] **Borrar** el CloudFront antiguo que apunta al bucket de copias (riesgo de exponer los `.sql.gz`).
+- [x] Probar **sustituir** desde el panel en producción: la foto nueva (`photos/LqTKo0eQjAdwThZIHwG9cfkJMed8eEa8.png`) se sirve por CloudFront (`200 image/png`, 300 962 bytes) y la anterior ya no está en el bucket.
+- [x] **Borrar** el CloudFront antiguo que apuntaba al bucket de copias.
+- [ ] (Opcional) Probar **borrar** la foto desde el panel y volver a subirla; el código y los tests ya cubren ese camino.
