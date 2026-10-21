@@ -72,7 +72,7 @@ function AdminPerfil() {
           />
         </label>
         <PhotoUploader
-          currentPhoto={data?.photo || null}
+          currentPhoto={data?.photo_url || data?.photo || null}
           onUploaded={(result) => setData(result)}
           onRemoved={() => setData({ ...data, photo: null })}
           readOnly={!canEdit}

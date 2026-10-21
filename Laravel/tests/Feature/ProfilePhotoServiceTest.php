@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Services\ProfilePhotoService;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Format;
 use Intervention\Image\Laravel\Facades\Image;
+use Mockery;
+use RuntimeException;
 use Tests\TestCase;
 
 class ProfilePhotoServiceTest extends TestCase
@@ -17,7 +20,7 @@ class ProfilePhotoServiceTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
-        $this->service = new ProfilePhotoService();
+        $this->service = new ProfilePhotoService;
     }
 
     private function makeImage(string $name, int $width, int $height): UploadedFile
@@ -121,5 +124,43 @@ class ProfilePhotoServiceTest extends TestCase
         $this->service->delete(null);
 
         $this->assertTrue(true);
+    }
+
+    public function test_stores_on_the_configured_disk(): void
+    {
+        Storage::fake('s3');
+        config(['filesystems.photo_disk' => 's3']);
+
+        $path = $this->service->store($this->makeImage('s3.jpg', 300, 300));
+
+        Storage::disk('s3')->assertExists($path);
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_delete_uses_the_configured_disk(): void
+    {
+        Storage::fake('s3');
+        config(['filesystems.photo_disk' => 's3']);
+
+        $path = $this->service->store($this->makeImage('borrar-s3.jpg', 300, 300));
+
+        Storage::disk('s3')->assertExists($path);
+
+        $this->service->delete($path);
+
+        Storage::disk('s3')->assertMissing($path);
+    }
+
+    public function test_replace_keeps_the_previous_photo_when_storing_fails(): void
+    {
+        $disk = Mockery::mock(Filesystem::class);
+        $disk->shouldReceive('put')->once()->andReturn(false);
+        $disk->shouldNotReceive('delete');
+
+        Storage::shouldReceive('disk')->once()->andReturn($disk);
+
+        $this->expectException(RuntimeException::class);
+
+        $this->service->replace('photos/anterior.jpg', $this->makeImage('nueva.jpg', 300, 300));
     }
 }

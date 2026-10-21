@@ -13,7 +13,7 @@ function SessionChip() {
   const [imgFailed, setImgFailed] = useState(false);
 
   const name = user?.name?.trim() || t('nav.mi_cuenta');
-  const src = imgFailed ? null : photoUrl(profile?.photo);
+  const src = imgFailed ? null : photoUrl(profile?.photo_url || profile?.photo);
   const initials = getInitials(name);
 
   return (

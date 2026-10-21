@@ -5,7 +5,7 @@ Puesta en línea del portfolio en AWS, con `rbielsam.es` como dominio.
 Este documento es la **única fuente** para desplegar, actualizar y restaurar. Está escrito para seguirse paso a paso sin interpretar. Si algo no cuadra, **se para y se pregunta**.
 
 > **Spec**: `specs/017-despliegue-aws/`
-> **Fotos en S3 y CloudFront**: pendiente, spec 018.
+> **Fotos en S3 y CloudFront**: ver §12 (spec 018).
 
 ---
 
@@ -32,6 +32,8 @@ Y **nunca se edita el código directamente en el servidor**: si se hace, el ento
 | RDS `db.t3.micro` | incluido | ≈ 13 $/mes |
 | **IPv4 pública (IP elástica)** | **≈ 3,60 $/mes — NO cubierta** | ≈ 3,60 $/mes |
 | S3 (copias) | incluido | céntimos |
+| S3 (fotos) | incluido | céntimos |
+| CloudFront (fotos) | capa gratuita permanente | ≈ 0 $/mes |
 | Dominio `.com` | ≈ 1 – 11 $ el año | ≈ 10 – 15 $/año |
 | **Total** | **≈ 3,60 $/mes + el dominio** | **≈ 26 – 32 $/mes** |
 
@@ -552,7 +554,9 @@ sudo crontab -e
 0 4 * * * /usr/local/bin/respaldo-portfolio >> /var/log/respaldo-portfolio.log 2>&1
 ```
 
-> **Lo que esta copia NO cubre: las fotos.** Están en el disco del servidor y no se respaldan aquí — la respaldabilidad de imágenes es la spec 018, que las mueve a S3. Si se pierde el disco antes de esa spec, se pierden las fotos subidas desde el panel.
+> **Las fotos no van en esta copia.** Desde la spec 018 están en un bucket de S3 propio y se sirven por CloudFront; S3 las protege por sí mismo. Esta copia cubre **solo la base de datos**.
+
+> **CloudFront** tiene capa gratuita **permanente** (1 TB de transferencia y 10 M peticiones al mes), así que para un portfolio no debería aparecer en la factura.
 
 ### ⚠️ Probar la restauración
 
@@ -674,3 +678,130 @@ Antes de restaurar sobre la real, haz una **copia de seguridad** del estado actu
 - [ ] Provocar un error **no** muestra trazas ni valores de entorno.
 - [ ] La base de datos **no responde** desde internet.
 - [ ] El repositorio no contiene claves.
+
+---
+
+## 12 · Fotos en S3 y CloudFront
+
+Hasta aquí las fotos viven en el disco de la EC2. Esta sección las mueve a **S3** y las sirve por **CloudFront** (spec 018).
+
+```
+Panel ──POST /api/profile/photo──▶ Laravel (EC2)
+                                     │ PutObject (rol IAM)
+                                     ▼
+                               S3 privado (photos/)
+                                     ▲ OAC
+                               CloudFront (cdn.rbielsam.es)
+                                     ▲
+                                     │ HTTPS
+                               Visitante
+```
+
+### 12.1 · Bucket de fotos
+
+Crea un bucket **privado** solo para las fotos. **No** reutilices el de las copias: si una política se configura mal, no debe poder exponer los respaldos.
+
+- Nombre único, por ejemplo `portfolio-fotos-<cuenta>-<región>`.
+- **Bloqueo de acceso público: activado**.
+- Cifrado: el que viene por defecto (SSE-S3) es suficiente.
+
+### 12.2 · Certificado en ACM (`us-east-1`)
+
+CloudFront **solo acepta certificados de `us-east-1`**, aunque el bucket esté en `eu-south-2`.
+
+1. En ACM, cambia la región a **us-east-1**.
+2. Solicita un certificado público para **`cdn.rbielsam.es`**.
+3. Elige **validación por DNS** y crea en IONOS el CNAME que indique AWS.
+4. Espera a que el certificado pase a **Emitido**.
+
+### 12.3 · Distribución de CloudFront
+
+1. Origen: el bucket de fotos.
+2. **Origin access control (OAC)**: crea uno y aplícalo. CloudFront ofrecerá actualizar la política del bucket; acepta.
+3. **Dominio alternativo (CNAME)**: `cdn.rbielsam.es`, con el certificado del paso 12.2.
+4. Comportamiento por defecto:
+   - Redirigir HTTP a HTTPS.
+   - Métodos: `GET` y `HEAD`.
+   - Política de caché: `CachingOptimized`.
+5. Anota el dominio de la distribución (`dxxxx.cloudfront.net`).
+
+### 12.4 · DNS
+
+En IONOS, crea un CNAME:
+
+| Nombre | Tipo | Valor |
+|---|---|---|
+| `cdn` | CNAME | `<distribución>.cloudfront.net` |
+
+Comprueba que resuelve:
+
+```bash
+dig +short cdn.rbielsam.es
+```
+
+### 12.5 · Permisos del rol
+
+Amplía el rol de la EC2 (el mismo de las copias) con:
+
+| Acción | Recurso |
+|---|---|
+| `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject` | `arn:aws:s3:::<bucket-fotos>/*` |
+| `s3:ListBucket` | `arn:aws:s3:::<bucket-fotos>` |
+
+Sin esta ampliación, subir una foto desde el panel falla aunque CloudFront esté bien.
+
+### 12.6 · Configurar el servidor
+
+En el `.env` del servidor:
+
+```bash
+PHOTO_DISK=s3
+AWS_DEFAULT_REGION=eu-south-2
+AWS_BUCKET=<bucket-fotos>
+AWS_URL=https://cdn.rbielsam.es
+```
+
+**No** pongas `AWS_ACCESS_KEY_ID` ni `AWS_SECRET_ACCESS_KEY`: el servidor usa el rol de IAM. Si estuvieran puestas, el SDK las usaría y podrían quedar en disco sin necesidad.
+
+### 12.7 · Migrar la foto actual
+
+En el servidor, copia la foto que ya existe (sustituye `<fichero>` por el nombre real):
+
+```bash
+cd /var/www/portfolio/Laravel
+aws s3 cp storage/app/public/photos/<fichero>.jpg \
+    s3://<bucket-fotos>/photos/<fichero>.jpg
+```
+
+Comprueba que CloudFront la sirve:
+
+```bash
+curl -I https://cdn.rbielsam.es/photos/<fichero>.jpg
+```
+
+Debe devolver `200` y `content-type: image/jpeg`. Cuando la veas en la web, borra la copia local:
+
+```bash
+rm storage/app/public/photos/<fichero>.jpg
+```
+
+La base de datos **no cambia**: sigue guardando `photos/<fichero>`.
+
+### 12.8 · Publicar
+
+```bash
+PORTFOLIO_SERVIDOR=portfolio deploy/publicar.sh
+```
+
+El script instala el adaptador de S3 (ya está en `composer.lock`) y refresca la caché. A partir de aquí, subir, sustituir y borrar desde el panel usan S3.
+
+### Comprobar
+
+1. Sube una foto desde el panel: aparece en la portada con una URL `https://cdn.rbielsam.es/photos/...`.
+2. Sustituye: se ve la nueva y el objeto anterior desaparece del bucket.
+3. Borra: la portada muestra las iniciales.
+4. `curl -I https://cdn.rbielsam.es/photos/<fichero>` → `200` y `content-type: image/jpeg`.
+5. El acceso directo al endpoint de S3 del objeto → `403`.
+6. En local, con `PHOTO_DISK=public`, todo sigue funcionando sin AWS.
+
+> **Si la foto no aparece:** revisa primero `AWS_URL` (sin ella Laravel genera la URL privada de S3), después los permisos del rol y por último la caché de configuración (`php artisan config:clear` o volver a publicar).

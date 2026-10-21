@@ -12,7 +12,7 @@ function Inicio() {
   if (error) return <ErrorMessage message={error} />;
   if (!data) return null;
 
-  const image = photoUrl(data.photo);
+  const image = photoUrl(data.photo_url || data.photo);
   const initials = getInitials(data.name);
 
   return (

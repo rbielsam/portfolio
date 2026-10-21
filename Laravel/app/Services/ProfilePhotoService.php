@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Format;
 use Intervention\Image\Laravel\Facades\Image;
-use Intervention\Image\Interfaces\ImageInterface;
+use RuntimeException;
 
 class ProfilePhotoService
 {
@@ -17,7 +17,7 @@ class ProfilePhotoService
 
     public const DIRECTORY = 'photos';
 
-    public const DISK = 'public';
+    public const DEFAULT_DISK = 'public';
 
     public function store(UploadedFile $file): string
     {
@@ -28,10 +28,14 @@ class ProfilePhotoService
             ->cover(self::SIZE, self::SIZE)
             ->orient();
 
-        Storage::disk(self::DISK)->put(
+        $stored = Storage::disk($this->disk())->put(
             $path,
             $image->encodeUsingFormat($this->formatFor($extension), quality: self::QUALITY)
         );
+
+        if (! $stored) {
+            throw new RuntimeException('No se pudo guardar la foto.');
+        }
 
         return $path;
     }
@@ -55,7 +59,12 @@ class ProfilePhotoService
             return;
         }
 
-        Storage::disk(self::DISK)->delete($path);
+        Storage::disk($this->disk())->delete($path);
+    }
+
+    private function disk(): string
+    {
+        return config('filesystems.photo_disk', self::DEFAULT_DISK);
     }
 
     private function extensionFor(UploadedFile $file): string
