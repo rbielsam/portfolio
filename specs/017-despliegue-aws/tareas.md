@@ -1,6 +1,6 @@
 # Tareas — Puesta en línea del portfolio en AWS (Spec 017)
 
-Estado: **fases 0 a 5 completadas**, **publicado (T6)** y **copias a S3 (T7)**. **Pendiente: correo (T8) y verificación (T9).** El dominio **`rbielsam.es`** ya está contratado (IONOS).
+Estado: **fases 0 a 5 completadas**, **publicado (T6)**, **copias a S3 (T7)** y **correo configurado (T8)**. **Pendiente: verificación final (T9).** Dominio **`rbielsam.es`** (IONOS), HTTPS con Certbot y envío desde **`send.rbielsam.es`** (Resend).
 
 > Esta spec **no modifica la aplicación ni ningún test**. Toca tres ficheros del repositorio y, sobre todo, infraestructura y servidor.
 >
@@ -263,8 +263,8 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 - [x] T6.3
 - [x] T7.1
 - [x] T7.2
-- [ ] T8.1
-- [ ] T8.2
+- [x] T8.1
+- [x] T8.2
 - [ ] T9.1
 - [ ] T9.2
 - [ ] T9.3
@@ -274,3 +274,5 @@ Dejar escrito en `docs/despliegue.md` **lo que cuesta hoy** y **lo que empezará
 > **T2.2** (revisar el Free Tier) no está confirmado. **T4.2** completado (Composer + Certbot/HTTPS). **T6.3** no hizo falta: la raíz sirvió el portfolio directamente (nginx sirve `index.html` antes que `index.php`).
 
 > **Resuelto (T3.1)**: el rol IAM `portfolio-respaldos-role` tenía los ARN duplicados (`arn:aws:s3:::arn:aws:s3:::…`), así que `s3:PutObject` no casaba con el bucket. Corregido y verificado con un respaldo real.
+>
+> **T8 (correo)**: dominio verificado en Resend como **`send.rbielsam.es`** (subdominio, recomendado por Resend), registros DNS añadidos en IONOS y servidor configurado (`MAIL_MAILER=resend`, `RESEND_API_KEY`, `MAIL_FROM_ADDRESS=noreply@send.rbielsam.es`, `ADMIN_EMAIL`). `portfolio:test-email` envía correctamente. Falta la comprobación humana de que **llega** (T9).
