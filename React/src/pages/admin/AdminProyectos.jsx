@@ -122,6 +122,15 @@ function AdminProyectos() {
             onChange={(e) => setEditing({ ...editing, url: e.target.value })}
           />
         </label>
+        <label className="admin-form__label">
+          {t('proyectos.tecnologias')}
+          <input
+            className="admin-form__input"
+            value={editing?.technologies || ''}
+            onChange={(e) => setEditing({ ...editing, technologies: e.target.value })}
+          />
+          <small className="admin-form__hint">{t('proyectos.tecnologias_ayuda')}</small>
+        </label>
         <MonthYearPicker
           label={t('proyectos.fecha')}
           value={editing?.date || ''}

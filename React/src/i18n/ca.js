@@ -67,6 +67,8 @@ export default {
 
   'proyectos.ver': 'Ves al projecte',
   'proyectos.url': 'URL',
+  'proyectos.tecnologias': 'Tecnologies',
+  'proyectos.tecnologias_ayuda': 'Separades per comes',
   'proyectos.fecha': 'Data',
 
   'admin.titulo': 'Administració',

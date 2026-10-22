@@ -130,6 +130,12 @@
   resize: vertical;
 }
 
+.admin-form__hint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--admin-text-muted);
+}
+
 .admin-form__dates {
   display: flex;
   gap: 0.5rem;
@@ -178,6 +184,24 @@
 
 .admin-list__item span {
   flex: 1;
+}
+
+.admin-list__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-list__label {
+  display: block;
+  overflow-wrap: break-word;
+}
+
+.admin-list__dates {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--admin-text-muted);
 }
 
 .admin-list__item button {

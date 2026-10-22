@@ -67,6 +67,8 @@ export default {
 
   'proyectos.ver': 'View project',
   'proyectos.url': 'URL',
+  'proyectos.tecnologias': 'Technologies',
+  'proyectos.tecnologias_ayuda': 'Comma-separated',
   'proyectos.fecha': 'Date',
 
   'admin.titulo': 'Administration',

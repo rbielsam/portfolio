@@ -19,14 +19,16 @@ function Formacion() {
       <ul className="section__list">
         {data.map((item) => (
           <li key={item.id} className="section__item">
-            <h3 className="section__item-title">{item.title}</h3>
-            <p className="section__item-subtitle">{item.institution}</p>
             <p className="section__item-date">
               {formatMonthYear(item.start_date, lang)} - {item.is_current || !item.end_date ? t('fecha.actualidad') : formatMonthYear(item.end_date, lang)}
             </p>
-            {item.description && (
-              <p className="section__item-desc">{item.description}</p>
-            )}
+            <div className="section__item-body">
+              <h3 className="section__item-title">{item.title}</h3>
+              <p className="section__item-subtitle">{item.institution}</p>
+              {item.description && (
+                <p className="section__item-desc">{item.description}</p>
+              )}
+            </div>
           </li>
         ))}
       </ul>

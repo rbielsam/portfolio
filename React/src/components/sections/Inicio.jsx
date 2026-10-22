@@ -17,22 +17,28 @@ function Inicio() {
 
   return (
     <section className="inicio">
-      <div className={`avatar ${image ? '' : 'avatar--initials'}`}>
-        {image ? (
-          <img
-            src={image}
-            alt={data.name ? t('inicio.foto_alt', { name: data.name }) : t('inicio.foto_anon')}
-            className="avatar__image"
-          />
-        ) : (
-          <span className="avatar__initials" aria-hidden="true">
-            {initials}
-          </span>
-        )}
+      <div className="inicio__hero">
+        <div className="inicio__identity">
+          <div className={`avatar ${image ? '' : 'avatar--initials'}`}>
+            {image ? (
+              <img
+                src={image}
+                alt={data.name ? t('inicio.foto_alt', { name: data.name }) : t('inicio.foto_anon')}
+                className="avatar__image"
+              />
+            ) : (
+              <span className="avatar__initials" aria-hidden="true">
+                {initials}
+              </span>
+            )}
+          </div>
+          <h2 className="inicio__name">{data.name}</h2>
+        </div>
+        <div className="inicio__intro">
+          <p className="inicio__title">{data.title}</p>
+          {data.bio && <p className="inicio__bio">{data.bio}</p>}
+        </div>
       </div>
-      <h2 className="inicio__name">{data.name}</h2>
-      <p className="inicio__title">{data.title}</p>
-      <p className="inicio__bio">{data.bio}</p>
     </section>
   );
 }

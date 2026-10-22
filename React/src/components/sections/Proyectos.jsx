@@ -15,32 +15,56 @@ function Proyectos() {
   return (
     <section className="proyectos">
       <h2 className="section__title">{t('seccion.proyectos')}</h2>
-      <ul className="section__list">
-        {data.map((item) => (
-          <li key={item.id} className="section__item">
-            {item.image && (
-              <img
-                src={item.image}
-                alt={item.title}
-                className="section__item-image"
-              />
-            )}
-            <h3 className="section__item-title">{item.title}</h3>
-            {item.description && (
-              <p className="section__item-desc">{item.description}</p>
-            )}
-            {item.url && (
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="section__item-link"
-              >
-                {t('proyectos.ver')}
-              </a>
-            )}
-          </li>
-        ))}
+      <ul className="section__list section__list--grid">
+        {data.map((item) => {
+          const technologies = item.technologies
+            ? [
+                ...new Set(
+                  item.technologies
+                    .split(',')
+                    .map((tech) => tech.trim())
+                    .filter(Boolean)
+                ),
+              ]
+            : [];
+
+          return (
+            <li key={item.id} className="section__item section__item--card">
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="section__item-image"
+                />
+              )}
+              <div className="section__item-body">
+                <h3 className="section__item-title">{item.title}</h3>
+                {item.description && (
+                  <p className="section__item-desc">{item.description}</p>
+                )}
+                {technologies.length > 0 && (
+                  <ul className="section__item-tags">
+                    {technologies.map((tech) => (
+                      <li key={tech} className="section__item-tag">
+                        {tech}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {item.url && (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="section__item-link"
+                  >
+                    {t('proyectos.ver')} <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

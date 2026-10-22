@@ -5,13 +5,14 @@ import Loading from '../../components/Loading.jsx';
 import ErrorMessage from '../../components/ErrorMessage.jsx';
 import EmptyData from '../../components/EmptyData.jsx';
 import MonthYearPicker from '../../components/admin/MonthYearPicker.jsx';
+import { formatMonthYear } from '../../utils/dates.js';
 
 import { usePermissions } from '../../hooks/usePermissions.js';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 
 function AdminExperiencia() {
   const { can } = usePermissions();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const canEdit = can('experience');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +88,12 @@ function AdminExperiencia() {
         <ul className="admin-list">
           {data.map((item) => (
             <li key={item.id} className="admin-list__item">
-              <span>{item.position} - {item.company}</span>
+              <div className="admin-list__info">
+                <span className="admin-list__label">{item.position} - {item.company}</span>
+                <span className="admin-list__dates">
+                  {formatMonthYear(item.start_date, lang)} - {item.is_current || !item.end_date ? t('fecha.actualidad') : formatMonthYear(item.end_date, lang)}
+                </span>
+              </div>
               {canEdit && <button onClick={() => handleEdit(item)}>{t('common.editar')}</button>}
               {canEdit && <button onClick={() => handleDelete(item.id)}>{t('common.borrar')}</button>}
             </li>
@@ -112,6 +118,14 @@ function AdminExperiencia() {
             className="admin-form__input"
             value={editing?.company || ''}
             onChange={(e) => setEditing({ ...editing, company: e.target.value })}
+          />
+        </label>
+        <label className="admin-form__label">
+          {t('common.descripcion')}
+          <textarea
+            className="admin-form__textarea"
+            value={editing?.description || ''}
+            onChange={(e) => setEditing({ ...editing, description: e.target.value })}
           />
         </label>
         <MonthYearPicker

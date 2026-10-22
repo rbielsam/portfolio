@@ -13,7 +13,12 @@
   --color-hover: #2a5a8a;
   --color-hover-shadow: rgba(91, 163, 217, 0.3);
   --color-danger: #e74c3c;
+  --color-surface: rgba(15, 39, 64, 0.72);
+  --color-accent-soft: rgba(91, 163, 217, 0.12);
   --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --content-max: 1080px;
+  --reading-max: 65ch;
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;
