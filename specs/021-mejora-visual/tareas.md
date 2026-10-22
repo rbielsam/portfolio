@@ -1,6 +1,6 @@
 # Tareas — Mejora visual y presentación del contenido (Spec 021)
 
-Estado: **COMPLETADA** (local, sin publicar).
+Estado: **COMPLETADA y publicada** (commit `3cb8775`).
 
 > Spec, plan y tareas aprobados. Verificación automática y visual realizadas.
 
@@ -107,4 +107,5 @@ Estado: **COMPLETADA** (local, sin publicar).
 ### T10.3 — Cierre
 
 - [x] Actualizar `MEMORY.md` con el resultado.
-- [x] No publicar hasta que la persona usuaria lo pida.
+- [x] Publicación autorizada por la persona usuaria y realizada con `deploy/publicar.sh`.
+- [x] Verificado en producción: `https://rbielsam.es` responde 200, con las secciones y el footer correctos, sin desbordamiento a 375 px.
