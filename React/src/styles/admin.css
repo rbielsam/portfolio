@@ -434,6 +434,131 @@
   background: var(--admin-role-reader);
 }
 
+/* Gestión de imágenes de un proyecto */
+.project-images {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+}
+
+.project-images__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.project-images__title {
+  font-size: 1.1rem;
+  color: var(--admin-heading);
+  overflow-wrap: break-word;
+}
+
+.project-images__hint,
+.project-images__empty,
+.project-images__filename {
+  font-size: 0.85rem;
+  color: var(--admin-text-muted);
+  overflow-wrap: break-word;
+}
+
+.project-images__warning {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--admin-warning-border);
+  border-left: 4px solid var(--admin-warning);
+  border-radius: 4px;
+  background: var(--admin-warning-bg);
+  color: var(--admin-warning-text);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.project-images__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+}
+
+.project-images__item {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  background: var(--admin-surface-soft);
+}
+
+.project-images__thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  background: var(--admin-surface-sunk);
+}
+
+.project-images__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Las etiquetas ocupan todo el ancho del cuerpo: si no, el campo se encoge
+   hasta el ancho por defecto del textarea y el comentario queda ilegible. */
+.project-images__body > .admin-form__label {
+  width: 100%;
+  min-width: 0;
+}
+
+.project-images__caption {
+  width: 100%;
+  min-width: 0;
+}
+
+.project-images__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.project-images__upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--admin-border);
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .project-images {
+    padding: 1rem;
+  }
+
+  .project-images__item {
+    grid-template-columns: 1fr;
+  }
+
+  .project-images__thumb {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .admin {
     flex-direction: column;

@@ -182,6 +182,7 @@ return [
         'description' => 'descripción',
         'url' => 'URL',
         'image' => 'imagen',
+        'caption' => 'comentario',
         'role' => 'rol',
         'website' => 'sitio web',
         'start_date' => 'fecha de inicio',

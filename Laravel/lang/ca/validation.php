@@ -182,6 +182,7 @@ return [
         'description' => 'descripció',
         'url' => 'URL',
         'image' => 'imatge',
+        'caption' => 'comentari',
         'role' => 'rol',
         'website' => 'lloc web',
         'start_date' => 'data dinici',

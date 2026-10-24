@@ -5,6 +5,7 @@ import Loading from '../../components/Loading.jsx';
 import ErrorMessage from '../../components/ErrorMessage.jsx';
 import EmptyData from '../../components/EmptyData.jsx';
 import MonthYearPicker from '../../components/admin/MonthYearPicker.jsx';
+import ProjectImageManager from '../../components/admin/ProjectImageManager.jsx';
 
 import { usePermissions } from '../../hooks/usePermissions.js';
 import { useLanguage } from '../../context/LanguageContext.jsx';
@@ -65,6 +66,19 @@ function AdminProyectos() {
     } catch (err) {
       setFormError(err);
     }
+  }
+
+  function handleImagesChange(projectId, images) {
+    const cover = images[0]?.url ?? null;
+
+    setEditing((current) =>
+      current?.id === projectId ? { ...current, images, cover_url: cover } : current
+    );
+    setData((current) =>
+      current.map((item) =>
+        item.id === projectId ? { ...item, images, cover_url: cover } : item
+      )
+    );
   }
 
   if (loading) return <Loading />;
@@ -145,6 +159,18 @@ function AdminProyectos() {
           </button>
         </div>
       </form>
+      )}
+
+      {canEdit && showForm && !editing?.id && (
+        <p className="admin-form__hint">{t('proyectos.guardar_primero')}</p>
+      )}
+
+      {canEdit && showForm && editing?.id && (
+        <ProjectImageManager
+          key={editing.id}
+          project={editing}
+          onImagesChange={(images) => handleImagesChange(editing.id, images)}
+        />
       )}
     </div>
   );

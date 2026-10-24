@@ -14,7 +14,8 @@ import Login from './pages/Login.jsx'
 import AdminLayout from './pages/admin/AdminLayout.jsx'
 import Loading from './components/Loading.jsx'
 import useMediaQuery from './hooks/useMediaQuery.js'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import './styles/global.css'
 import './styles/layout.css'
 import './styles/navigation.css'
@@ -59,6 +60,15 @@ function PublicView() {
 function AppContent() {
   const { activeSection, setActiveSection } = useSection()
   const { user, loading } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (activeSection !== 'Proyectos' && searchParams.has('proyecto')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('proyecto')
+      setSearchParams(next, { replace: true })
+    }
+  }, [activeSection, searchParams, setSearchParams])
 
   if (loading) return <Loading />
 

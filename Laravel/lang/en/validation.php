@@ -182,6 +182,7 @@ return [
         'description' => 'description',
         'url' => 'url',
         'image' => 'image',
+        'caption' => 'caption',
         'role' => 'role',
         'website' => 'website',
         'start_date' => 'start date',

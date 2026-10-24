@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ExperienceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProfilePhotoController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\ProjectImageController;
 use Illuminate\Support\Facades\Route;
 
 // Autenticación por cookie de sesión (SPA stateful)
@@ -49,6 +50,11 @@ Route::middleware(['auth:sanctum', 'role:admin,editor'])->group(function () {
     Route::post('/projects', [ProjectController::class, 'store']);
     Route::put('/projects/{id}', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+
+    // Imágenes de proyectos
+    Route::post('/projects/{project}/images', [ProjectImageController::class, 'store']);
+    Route::put('/projects/{project}/images/{image}', [ProjectImageController::class, 'update']);
+    Route::delete('/projects/{project}/images/{image}', [ProjectImageController::class, 'destroy']);
 
     // Contacto interno (solo administrador y editor)
     Route::get('/contact', [ContactController::class, 'index']);

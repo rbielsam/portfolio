@@ -280,7 +280,30 @@ sudo sed -i 's/^pm.max_spare_servers = .*/pm.max_spare_servers = 2/' /etc/php/8.
 sudo systemctl restart php8.5-fpm
 ```
 
-### 3.4 · Cliente de MySQL y AWS CLI
+### 3.4 · Límite de subida de PHP
+
+nginx ya admite 8 MB (`client_max_body_size 8m`), pero **PHP trae 2 MB por defecto** (`upload_max_filesize = 2M`) y corta antes que Laravel: la imagen de proyecto se valida en 5 MB (`max:5120`), así que sin este ajuste la subida falla con un error de tamaño aunque el archivo sea válido.
+
+```bash
+sudo tee /etc/php/8.5/fpm/conf.d/99-portfolio-uploads.ini > /dev/null <<'INI'
+upload_max_filesize = 8M
+post_max_size = 8M
+INI
+
+sudo systemctl restart php8.5-fpm
+```
+
+`post_max_size` es el límite del cuerpo completo de la petición: tiene que ser algo mayor que 5 MB para que quepan la imagen y los campos del formulario.
+
+Comprueba que PHP-FPM los ha leído (los valores salen como `8M`):
+
+```bash
+php -i | grep -E 'upload_max_filesize|post_max_size'
+```
+
+> **Esto no crea infraestructura nueva**: es un fichero `.ini` dentro del PHP ya instalado. Si en el futuro se sube el límite de las imágenes, hay que tocar a la vez la validación de Laravel, `client_max_body_size` y este fichero.
+
+### 3.5 · Cliente de MySQL y AWS CLI
 
 El servidor usa **AWS CLI 2** (`aws --version` → `aws-cli/2.x`). Ubuntu distribuye `awscli` en sus repos, pero esa es la **v1**; la v2 se instala con el instalador oficial de AWS:
 
@@ -295,7 +318,7 @@ aws --version
 
 > `unzip` ya se instaló en el paso 3.1. Si `aws --version` ya respondiera `aws-cli/2.x`, no hay que repetirlo: el instalador actualiza sobre lo existente.
 
-### 3.5 · Composer
+### 3.6 · Composer
 
 ```bash
 curl -sS https://getcomposer.org/installer | sudo php -- \
