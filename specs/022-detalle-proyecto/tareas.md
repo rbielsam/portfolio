@@ -382,3 +382,5 @@ Comprobada en navegador con datos de demostración sobre una base SQLite tempora
 - [x] Verificar que la web sigue respondiendo: raíz `200` con el portfolio, `/api/projects` `200` y `/?proyecto=2` abre el detalle sin galería.
 - [x] Subir una imagen de prueba desde el panel de producción, comprobar la URL de CloudFront (`cdn.rbielsam.es`, `200`, `image/png`), el acceso directo a S3 (`403`) y borrarla; además se probó un PNG de 2,5 MB (por encima del límite anterior de 2 MB) que se guardó a 1200×700.
 - [x] Revisar los logs de Laravel y de Nginx: sin errores nuevos (el único `production.ERROR` del log es del 19/10, de `setup-admin` sin interacción).
+
+**Contenido**: tras la publicación se subieron a producción las **5 capturas del panel** del proyecto «Portfolio personal» (id 2), en el mismo orden y con los mismos comentarios que en local; la primera (perfil) es la portada. Verificado en `https://rbielsam.es/?proyecto=2` a 1440 y 375 px (5 figuras, sin desbordamiento) y las 5 URLs de CloudFront responden `200`.
