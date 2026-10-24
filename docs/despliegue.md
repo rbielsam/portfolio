@@ -295,11 +295,13 @@ sudo systemctl restart php8.5-fpm
 
 `post_max_size` es el límite del cuerpo completo de la petición: tiene que ser algo mayor que 5 MB para que quepan la imagen y los campos del formulario.
 
-Comprueba que PHP-FPM los ha leído (los valores salen como `8M`):
+Comprueba que **PHP-FPM** los ha leído (los valores salen como `8M`):
 
 ```bash
-php -i | grep -E 'upload_max_filesize|post_max_size'
+php-fpm8.5 -i | grep -E 'upload_max_filesize|post_max_size'
 ```
+
+> **`php -i` no sirve aquí**: consulta el PHP de consola, que usa otro `php.ini` y seguiría mostrando `2M`. La web se ejecuta con FPM, así que hay que preguntar a `php-fpm8.5`.
 
 > **Esto no crea infraestructura nueva**: es un fichero `.ini` dentro del PHP ya instalado. Si en el futuro se sube el límite de las imágenes, hay que tocar a la vez la validación de Laravel, `client_max_body_size` y este fichero.
 

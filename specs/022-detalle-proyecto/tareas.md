@@ -1,6 +1,6 @@
 # Tareas — Detalle de proyecto con galería comentada (Spec 022)
 
-Estado: **implementada en local**. Pendiente: comprobación manual en navegador (responsive y funcional) y publicación.
+Estado: **completada y publicada** (24/10/2026, commit `beb8f29`). Producción verificada con `deploy/publicar.sh`.
 
 > Spec, plan y tareas aprobados por la persona usuaria, que autorizó expresamente la implementación.
 >
@@ -376,9 +376,9 @@ Comprobada en navegador con datos de demostración sobre una base SQLite tempora
 
 ### T12.3 — Publicación (solo con confirmación expresa)
 
-- [ ] Pedir confirmación explícita antes de publicar.
-- [ ] Aplicar el límite de PHP de 8M en producción y reiniciar `php8.5-fpm`.
-- [ ] Ejecutar `deploy/publicar.sh`.
-- [ ] Verificar que la migración se aplica y que la web sigue respondiendo.
-- [ ] Subir una imagen de prueba desde el panel de producción, comprobar la URL de CloudFront y borrarla.
-- [ ] Revisar los logs de Laravel y de Nginx.
+- [x] Pedir confirmación explícita antes de publicar.
+- [x] Aplicar el límite de PHP de 8M en producción (`/etc/php/8.5/fpm/conf.d/99-portfolio-uploads.ini`) y reiniciar `php8.5-fpm`; FPM muestra `upload_max_filesize = 8M` y `post_max_size = 8M`.
+- [x] Ejecutar `deploy/publicar.sh` → 278/278 frontend, 148/148 backend, build correcto y migración `2026_10_23_130152_create_project_images_table` aplicada en RDS.
+- [x] Verificar que la web sigue respondiendo: raíz `200` con el portfolio, `/api/projects` `200` y `/?proyecto=2` abre el detalle sin galería.
+- [x] Subir una imagen de prueba desde el panel de producción, comprobar la URL de CloudFront (`cdn.rbielsam.es`, `200`, `image/png`), el acceso directo a S3 (`403`) y borrarla; además se probó un PNG de 2,5 MB (por encima del límite anterior de 2 MB) que se guardó a 1200×700.
+- [x] Revisar los logs de Laravel y de Nginx: sin errores nuevos (el único `production.ERROR` del log es del 19/10, de `setup-admin` sin interacción).
