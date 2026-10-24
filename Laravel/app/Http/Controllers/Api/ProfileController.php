@@ -10,7 +10,7 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        return response()->json(Profile::first() ?? new Profile());
+        return response()->json(Profile::first() ?? new Profile);
     }
 
     public function update(Request $request)
@@ -21,11 +21,14 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:255'],
             'bio' => ['nullable', 'string'],
+            'github_url' => ['nullable', 'url:http,https', 'max:255'],
+            'linkedin_url' => ['nullable', 'url:http,https', 'max:255'],
             'photo' => ['nullable', 'string', 'max:255'],
         ]);
 
-        if (!$profile) {
+        if (! $profile) {
             $profile = Profile::create($validated);
+
             return response()->json($profile, 201);
         }
 

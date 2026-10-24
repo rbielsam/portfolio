@@ -176,6 +176,8 @@ return [
         'password' => 'password',
         'password_confirmation' => 'password confirmation',
         'title' => 'title',
+        'github_url' => 'GitHub',
+        'linkedin_url' => 'LinkedIn',
         'institution' => 'institution',
         'position' => 'position',
         'company' => 'company',

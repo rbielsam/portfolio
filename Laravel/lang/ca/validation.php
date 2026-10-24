@@ -176,6 +176,8 @@ return [
         'password' => 'contrasenya',
         'password_confirmation' => 'confirmació de la contrasenya',
         'title' => 'títol',
+        'github_url' => 'GitHub',
+        'linkedin_url' => 'LinkedIn',
         'institution' => 'institució',
         'position' => 'posició',
         'company' => 'empresa',

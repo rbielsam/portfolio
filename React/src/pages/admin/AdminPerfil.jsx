@@ -71,6 +71,26 @@ function AdminPerfil() {
             disabled={!canEdit}
           />
         </label>
+        <label className="admin-form__label">
+          {t('perfil.github')}
+          <input
+            className="admin-form__input"
+            type="url"
+            value={data?.github_url || ''}
+            onChange={(e) => setData({ ...data, github_url: e.target.value })}
+            disabled={!canEdit}
+          />
+        </label>
+        <label className="admin-form__label">
+          {t('perfil.linkedin')}
+          <input
+            className="admin-form__input"
+            type="url"
+            value={data?.linkedin_url || ''}
+            onChange={(e) => setData({ ...data, linkedin_url: e.target.value })}
+            disabled={!canEdit}
+          />
+        </label>
         <PhotoUploader
           currentPhoto={data?.photo_url || data?.photo || null}
           onUploaded={(result) => setData(result)}

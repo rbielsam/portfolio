@@ -11,7 +11,7 @@ class Profile extends Model
 {
     protected $table = 'profile';
 
-    protected $fillable = ['name', 'title', 'bio', 'photo'];
+    protected $fillable = ['name', 'title', 'bio', 'github_url', 'linkedin_url', 'photo'];
 
     protected $appends = ['photo_url'];
 

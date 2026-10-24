@@ -48,6 +48,11 @@ export default {
   'inicio.foto_alt': 'Foto de {name}',
   'inicio.foto_anon': 'Foto de perfil',
 
+  'social.github': 'GitHub',
+  'social.linkedin': 'LinkedIn',
+  'social.github_aria': 'Perfil de GitHub',
+  'social.linkedin_aria': 'Perfil de LinkedIn',
+
   'fecha.actualidad': 'Actualitat',
   'fecha.actual': 'Actual',
   'fecha.desde': 'Des de',
@@ -104,6 +109,8 @@ export default {
   'admin.cerrar_sesion': 'Tanca la sessió',
 
   'perfil.bio': 'Biografia',
+  'perfil.github': 'GitHub',
+  'perfil.linkedin': 'LinkedIn',
   'perfil.foto': 'Foto de perfil',
   'perfil.sin_foto': 'Sense foto',
   'perfil.preview_alt': 'Vista prèvia de la foto de perfil',

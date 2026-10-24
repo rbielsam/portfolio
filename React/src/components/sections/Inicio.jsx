@@ -3,6 +3,7 @@ import { useLanguage } from '../../context/LanguageContext.jsx';
 import { getInitials, photoUrl } from '../../utils/initials.js';
 import Loading from '../Loading.jsx';
 import ErrorMessage from '../ErrorMessage.jsx';
+import SocialLinks from '../SocialLinks.jsx';
 
 function Inicio() {
   const { data, loading, error } = useFetch('/profile');
@@ -37,6 +38,7 @@ function Inicio() {
         <div className="inicio__intro">
           <p className="inicio__title">{data.title}</p>
           {data.bio && <p className="inicio__bio">{data.bio}</p>}
+          <SocialLinks profile={data} />
         </div>
       </div>
     </section>
