@@ -1,6 +1,6 @@
 # Tareas — Enlaces a GitHub y LinkedIn (Spec 023)
 
-Estado: **implementación completada**. Pendiente: confirmación expresa para publicar.
+Estado: **completada y publicada**. Los enlaces reales quedan pendientes de rellenar desde el panel.
 
 > Spec y plan aprobados por la persona usuaria. La spec manda: si algo no está definido, se para y se pregunta.
 >
@@ -225,8 +225,8 @@ Estado: **implementación completada**. Pendiente: confirmación expresa para pu
 
 ### T10.3 — Publicación (solo con confirmación expresa)
 
-- [ ] Pedir confirmación explícita antes de publicar.
-- [ ] Ejecutar `deploy/publicar.sh`.
-- [ ] Verificar que la migración se aplica y que la web sigue respondiendo.
-- [ ] Guardar los enlaces desde el panel de producción y comprobar Inicio y pie.
-- [ ] Revisar los logs de Laravel y de Nginx.
+- [x] Pedir confirmación explícita antes de publicar.
+- [x] Ejecutar `deploy/publicar.sh`.
+- [x] Verificar que la migración se aplica y que la web sigue respondiendo.
+- [ ] Guardar los enlaces reales desde el panel de producción y comprobar Inicio y pie.
+- [x] Revisar los logs de Laravel y de Nginx.
